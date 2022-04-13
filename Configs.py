@@ -3,7 +3,6 @@ class SharedConfigurations():
     def __init__(self):
 
     # folders
-    # test comment
 
         # training
         self.path_classes= r"G:\Matea\DATASET\usecase Nachverpacken"
