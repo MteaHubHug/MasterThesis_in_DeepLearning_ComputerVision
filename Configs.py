@@ -20,17 +20,22 @@ class SharedConfigurations():
 
 
     # training
-        self.path_classes= r"G:\Matea\DATASET\usecase Nachverpacken"
+        self.path_classes=r"D:\DATASET\usecase Nachverpacken"
+        #self.path_classes= r"G:\Matea\DATASET\usecase Nachverpacken"
         #self.path_classes = r"/home/matea/DATASET/usecase Nachverpacken"  #### training in docker
+
+
         self.path_training_results = 'TRAINING/results_nachverpacken'
-        self.path_model = 'save_at_180.h5'
+        self.path_model = 'save_at_143.h5'
 
         # result preparation
-        self.orig_train_folder = r"G:\Matea\proba\Result_nachverpacken\train_dataset"
-        self.orig_valid_folder = r"G:\Matea\proba\Result_nachverpacken\validation_dataset"
 
-        #self.orig_train_folder = r"/home/matea/proba/Result_nachverpacken/train_dataset"
-        #self.orig_valid_folder = r"/home/matea/proba/Result_nachverpacken/validation_dataset"
+        self.orig_train_folder =r"D:\Results\Result_nachverpacken\train_dataset"
+        self.orig_valid_folder =r"D:\Results\Result_nachverpacken\validation_dataset"
+
+        #self.orig_train_folder = r"G:\Matea\proba\Result_nachverpacken\train_dataset"
+        #self.orig_valid_folder = r"G:\Matea\proba\Result_nachverpacken\validation_dataset"
+
     # parameters for training
 
         self.val_ratio = 0.2
@@ -50,8 +55,10 @@ class SharedConfigurations():
         self.string_not_ok_prediction = 'Nachverpacken'
 
     # results - visualizing :
-        self.ok_folder = r"G:\Matea\DATASET\usecase Nachverpacken\OK"
-        self.nok_folder = r"G:\Matea\DATASET\usecase Nachverpacken\NOK"
+        self.ok_folder = r"D:\DATASET\usecase Nachverpacken\OK"
+        self.nok_folder = r"D:\DATASET\usecase Nachverpacken\NOK"
+        #self.ok_folder = r"G:\Matea\DATASET\usecase Nachverpacken\OK"
+        #self.nok_folder = r"G:\Matea\DATASET\usecase Nachverpacken\NOK"
 
         #self.ok_folder = r"/home/matea/DATASET/usecase Nachverpacken/OK"
         #self.nok_folder = r"/home/matea/DATASET/usecase Nachverpacken/NOK"
