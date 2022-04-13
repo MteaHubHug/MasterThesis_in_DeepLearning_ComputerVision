@@ -51,6 +51,10 @@ def count_2s(input_file):
           cnt+=1
     return cnt
 
-res1=count_2s(input_file)
-res2=count_2s(input_file2)
-print(res1,res2)
+#res1=count_2s(input_file)
+#res2=count_2s(input_file2)
+#print(res1,res2)
+
+
+
+# After this, you can continue with "move_files.py"

@@ -11,6 +11,19 @@ from os.path import isfile, join
 # 2. use JSON file to see classification : OK/ NOK
 # those images that are NOK ==> move to NOK folder
 
+def copy_iriis_images(path,new_path):
+    images = os.listdir(path)
+    cnt=0
+    for image in images:
+        if(image[-4:]==".jpg"):
+           original=path + "\\" + image
+           target= new_path + "\\" + image
+           shutil.copy(original,target)
+           #print(image,cnt)
+           if(cnt%1000==0): print(cnt)
+           cnt+=1
+    return cnt
+
 
 def get_classes(input_file):
     json_decode = json.load(input_file)
@@ -30,23 +43,42 @@ def move_nok(path,new_path,classes):
         id=file.split("-")[0]
         if id in classes:
             if(classes[id]=="NOK"):
-                print(id,classes[id])
-                #original=path + "\\" + file
-                #target= new_path + "\\" + file
-                #shutil.move(original,target)
+                print(id,classes[id],cnt)
+                original=path + "\\" + file
+                target= new_path + "\\" + file
+                shutil.move(original,target)
                 cnt+=1
     return cnt
 
 
 input_file=open('wuerth_iriis.json', 'r')
-path=r'G:\Matea\Base_Line\dataset_temp\usecase Umschlichten\OK'
-new_path=r"G:\Matea\Base_Line\dataset_temp\usecase Umschlichten\NOK"
+#old_path=r"G:\Matea\FINAL_DATASET\iriis"
+old_path= r"G:\Matea\triplets"
+#path=r'G:\Matea\DATASET\usecase Nachverpacken\OK'
+#new_path=r"G:\Matea\DATASET\usecase Nachverpacken\NOK"
+path= r"G:\Matea\user_story_16691\usecase Nachverpacken\OK"
+new_path=r"G:\Matea\user_story_16691\usecase Nachverpacken\NOK"
+
+copied=copy_iriis_images(old_path,path)
+print(copied)
 
 classes=get_classes(input_file)
 
 #for classs in classes:
 #   print(classs,classes[classs])
 
-moved=move_nok(path,new_path,classes)
-print(moved)
+#moved=move_nok(path,new_path,classes)
+#print(moved)
+
+#########18 591  OK ;;;      2 727 NOK     ;;;  21 318 in SUM
+
+
+
+############# In wuerth_iriis.json there are ****17632**** IDs starting with 2
+############In IRIS Nachbesserung 708.json there are 17658 IDs starting with 2
+
+
+###user story requirment
+#### try to find up to ****17632**** correspondeces in WUERTH_nachverpacken
+#### try to find up to 3084 correspondeces in WUERTH_umschlichten
 
