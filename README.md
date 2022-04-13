@@ -40,16 +40,3 @@ When you see that accuracy and loss are satisfying,
 Model is defined in "model_definition.py"
 
 For visualizing the results, organize dataset with "separate_train_valid_data.py", then use "prepare_results_validation.py".
-
-
-
-
-
-
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
-
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
