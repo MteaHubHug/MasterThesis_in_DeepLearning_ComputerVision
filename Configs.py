@@ -38,7 +38,7 @@ class SharedConfigurations():
 
     # parameters for training
 
-        self.val_ratio = 0.2
+        self.val_ratio = 0.1
         self.img_size = (250, 400)
         self.img_mode = 'rgb'  # 'grayscale'
         self.batch_size = 51

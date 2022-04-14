@@ -21,11 +21,11 @@ class RandomColor(tf.keras.layers.Layer):
 
         self._range_contrast   = ( 0.8, 1.2)
         self._range_gamma      = ( 0.9, 1,1)
-        self._range_hue        = ( -0.5, 0.5) # hue needs to be in [-1,1] !
+        self._range_hue        = ( -0.2, 0.2) # hue needs to be in [-1,1] !
         self._range_saturation = ( 0.8, 1.2)
         self._range_brightness = ( -0.2, 0.2)
 
-    def call(self, images, training=None):
+    def call(self, images, training=True):
 
         if not training:
             return images
@@ -38,7 +38,7 @@ class RandomColor(tf.keras.layers.Layer):
 
         images = tf.image.adjust_contrast(images,contrast)
         images = tf.image.adjust_gamma(images,gamma)
-        images = tf.image.adjust_hue(images,0.5)
+        images = tf.image.adjust_hue(images,hue)
         images = tf.image.adjust_saturation(images,saturation)
         images = tf.image.adjust_brightness(images, delta=brightness)
 

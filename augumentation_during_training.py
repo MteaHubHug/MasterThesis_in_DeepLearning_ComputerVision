@@ -12,6 +12,7 @@ from tensorflow.keras.preprocessing import image_dataset_from_directory
 #from PIL import Image
 from keras.preprocessing.image import array_to_img
 from keras.preprocessing.image import save_img
+import cv2
 
 conf = SharedConfigurations()
 path_classes = conf.path_classes
@@ -34,6 +35,10 @@ saved_models = conf.saved_models
 aug_path = conf.augumented_examples_path
 model_path = conf.path_model
 
+
+build_size = (img_size[0], img_size[1], 3)
+model = Classifier.build_model(build_size, 2)
+models_list = [model]
 
 def get_models(models_path):
     models = os.listdir(models_path)
