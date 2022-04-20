@@ -25,7 +25,7 @@ class RandomColor(tf.keras.layers.Layer):
         self._range_saturation = ( 0.8, 1.2)
         self._range_brightness = ( -0.2, 0.2)
 
-    def call(self, images, training=True):
+    def call(self, images, training=None): # True
 
         if not training:
             return images

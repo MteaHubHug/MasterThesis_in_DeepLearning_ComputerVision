@@ -17,6 +17,12 @@ class SharedConfigurations():
         self.sirius_dest = r"G:\Matea\FINAL_DATASET\sirius"
         self.iriis_dest = r"G:\Matea\FINAL_DATASET\iriis"
 
+    # for moving files (move_files.py script) :
+        self.input_file = open('wuerth_iriis.json', 'r')
+        self.NV_OK=r'G:\Matea\DATASET\usecase Nachverpacken\OK'
+        self.NV_NOK=r"G:\Matea\DATASET\usecase Nachverpacken\NOK"
+        self.UM_OK=r'G:\Matea\DATASET\usecase Umschlichten\OK'
+        self.UM_NOK=r"G:\Matea\DATASET\usecase Umschlichten\NOK"
 
 
     # training
@@ -26,7 +32,7 @@ class SharedConfigurations():
 
 
         self.path_training_results = 'TRAINING/results_nachverpacken'
-        self.path_model = 'save_at_143.h5'
+        self.path_model = 'save_at_160.h5'
 
         # result preparation
 

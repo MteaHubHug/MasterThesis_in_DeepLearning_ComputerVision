@@ -7,9 +7,12 @@ import shutil
 from os import listdir
 from os.path import isfile, join
 
+from Configs import SharedConfigurations
 # 1. copy all files in OK folder
 # 2. use JSON file to see classification : OK/ NOK
 # those images that are NOK ==> move to NOK folder
+
+configs=SharedConfigurations()
 
 def copy_iriis_images(path,new_path):
     images = os.listdir(path)
@@ -31,7 +34,7 @@ def get_classes(input_file):
     for filename in json_decode["_via_img_metadata"]:
         id = json_decode["_via_img_metadata"][filename]["filename"].split("/")[1].split("_")[0].split("-")[0]
         classs = json_decode["_via_img_metadata"][filename]["file_attributes"]["classification"]
-        # print(id,classs)
+        # print(id,classs)      ###### IMPORTANT : THERE ARE NOW OTHER CLASSES BESIDE NOK/OK ---> see if you need to delte them ?!?!?!?!?!
         classes[id]=classs
     return classes
 
@@ -51,24 +54,25 @@ def move_nok(path,new_path,classes):
     return cnt
 
 
-input_file=open('wuerth_iriis.json', 'r')
+input_file=configs.input_file
 #old_path=r"G:\Matea\FINAL_DATASET\iriis"
-old_path= r"G:\Matea\triplets"
-#path=r'G:\Matea\DATASET\usecase Nachverpacken\OK'
-#new_path=r"G:\Matea\DATASET\usecase Nachverpacken\NOK"
-path= r"G:\Matea\user_story_16691\usecase Nachverpacken\OK"
-new_path=r"G:\Matea\user_story_16691\usecase Nachverpacken\NOK"
+#old_path= r"G:\Matea\triplets"
 
-copied=copy_iriis_images(old_path,path)
-print(copied)
+NV_OK=configs.NV_OK
+NV_NOK=configs.NV_NOK
+UM_OK=configs.UM_OK
+UM_NOK=configs.UM_NOK
+
+#copied=copy_iriis_images(old_path,path)
+#print(copied)
 
 classes=get_classes(input_file)
 
 #for classs in classes:
 #   print(classs,classes[classs])
 
-#moved=move_nok(path,new_path,classes)
-#print(moved)
+moved=move_nok(NV_OK,NV_NOK,classes)
+print(moved)
 
 #########18 591  OK ;;;      2 727 NOK     ;;;  21 318 in SUM
 

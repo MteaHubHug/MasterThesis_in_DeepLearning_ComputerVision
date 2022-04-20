@@ -11,7 +11,8 @@ configs=SharedConfigurations()
 def get_train_files(lines):
     train_files = []
     for ctr, filnam in enumerate(lines):
-        filename = filnam.split("/")[6][0:-1]
+        #filename = filnam.split("/")[6][0:-1]
+        filename = filnam.split("\\")[4][0:-1]
         #print(filename)
         train_files.append(filename)
     return  train_files
@@ -20,8 +21,9 @@ def get_train_files(lines):
 def get_valid_files(lines):
     valid_files = []
     for ctr, filnam in enumerate(lines):
-        filename = filnam.split("/")[6][0:-1]
-        print(filename)
+        #filename = filnam.split("/")[6][0:-1]
+        filename=filnam.split("\\")[4][0:-1]
+        #print(filename)
         valid_files.append(filename)
     return  valid_files
 
@@ -83,12 +85,12 @@ nok_folder = configs.nok_folder
 train_folder = configs.orig_train_folder
 valid_folder= configs.orig_valid_folder
 
-#with open(train_file_names) as f:
-#    L = f.readlines()
+with open(train_file_names) as f:
+    L = f.readlines()
 
-#trains=get_train_files(L)
-#copied_train=copy_train_files(trains,ok_folder,nok_folder,train_folder)
-#print(copied_train)
+trains=get_train_files(L)
+copied_train=copy_train_files(trains,ok_folder,nok_folder,train_folder)
+print(copied_train)
 
 
 with open(valid_file_names) as v:
