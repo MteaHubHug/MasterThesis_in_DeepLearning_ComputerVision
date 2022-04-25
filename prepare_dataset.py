@@ -169,4 +169,123 @@ sirius_dest=conf.sirius_dest
 
 # Continue with JSON_edditing.py script
 
+########################## FIX ::: iriis umschlichtung images have 11 characters long ids but sirius images have 10 chars long ids (umschlichtung case)
+### help yourself with this code :
+'''
+import os
+import shutil
+iriis_path=r"G:\Matea\FINAL_DATASET\wuerth_iriis" #longer
+sirius_path=r"G:\Matea\krdis4_renamed" #shorter
+sirius_new_path=r"G:\Matea\FINAL_DATASET\wuerth_sirius"
+matching_ums_path=r"G:\Matea\umschlihtung_filtered_images"
+def get_ums_iriis(path):
+    ims=os.listdir(path)
+    ids=[]
+    cnt=0
+    for im in ims:
+        id=im.split("_")[0].split("-")[0]
+        if(id[0]=="4"):
+            #print(id, " ; ", len(id)) # len=11
+            id=id[:-1]     ##################### IMPORTANT
+            #print(id, " ; ", len(id))
+            ids.append(id)
+            cnt+=1
+    print(cnt)
+    return ids
 
+def get_ums_sirius(path):
+    ims=os.listdir(path)
+    ids=[]
+    cnt=0
+    for im in ims:
+       exstension = im[-9:]
+       if(exstension=="color.png" and im[0]=="4"):
+         id=im.split("_")[0]
+         ids.append(id)
+         #print(id , " ; " , len(id)) 'len=10
+         cnt+=1
+    print(cnt)
+    return ids
+
+
+def get_matches(ids_iriis,ids_sirius):
+    matches=[]
+    cnt=0
+    for id in ids_sirius:
+        if id in ids_iriis:
+            #print(id)
+            matches.append(id)
+            cnt+=1
+    print(cnt)
+    return matches
+
+
+def extract_matching_files(path_krdis,new_path,matches):
+    krdis=os.listdir(path_krdis)
+    cnt=0
+    for krdi in krdis:
+        id=krdi.split("_")[0]
+        if id in matches:
+            old_path=path_krdis + "\\" + krdi
+            dest_path=new_path + "\\" + krdi
+            #print(old_path, "****",dest_path)
+            shutil.copy(old_path,dest_path)
+            cnt+=1
+            #print(cnt)
+
+
+def get_times(path):
+    files = os.listdir(path)
+    times = {}
+    for file in files:
+        extension = file[-4:]
+        if (extension == ".jpg"):
+            id = file.split("-")[0].split("_")[0]
+            id = id[:-1]
+            time =file.split("_")[0].split("-")[1]
+            times[id]=time
+    return times
+
+def add_time2name(times,path):
+    files = os.listdir(path)
+    cnt=0
+    for file in files:
+        extension = file[-4:]
+        if (extension != ".jpg"):
+            old_name=path+"\\"+ file
+            id = file.split("-")[0].split("_")[0]
+            if id in times:
+               #print(id, times[id])
+               exten=file.split("_")[1]
+               name=id+"-"+times[id]+"_"+exten
+               new_name=path+"\\"+name
+               #print(old_name + " ===> " +new_name)
+               os.rename(old_name,new_name)
+               cnt+=1
+               if(cnt%1000==0): print(cnt)
+
+def copy_ums(ums_path,sirius_new_path):
+    files=os.listdir(ums_path)
+    cnt=0
+    for file in files:
+        old_path=ums_path + "\\" + file
+        dest_path=sirius_new_path + "\\" + file
+        cnt+=1
+        shutil.copy(old_path,dest_path)
+    print(cnt)
+
+
+#ums_iriis=get_ums_iriis(iriis_path) # 3173
+#ums_sirius=get_ums_sirius(sirius_path) # 2007
+
+#matches=get_matches(ums_iriis,ums_sirius) #1730
+
+#extract_matching_files(sirius_path,matching_ums_path,matches)
+#times=get_times(iriis_path)
+#add_time2name(times,matching_ums_path)
+
+# now just copy all of these files to FINAL_DATASET/wueth_sirius
+#######copy_ums(matching_ums_path,sirius_new_path)
+
+
+'''

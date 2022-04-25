@@ -20,7 +20,7 @@ class RandomColor(tf.keras.layers.Layer):
         super(RandomColor, self).__init__(**kwargs)
 
         self._range_contrast   = ( 0.8, 1.2)
-        self._range_gamma      = ( 0.9, 1,1)
+        self._range_gamma      = ( 0.9, 1.1)
         self._range_hue        = ( -0.2, 0.2) # hue needs to be in [-1,1] !
         self._range_saturation = ( 0.8, 1.2)
         self._range_brightness = ( -0.2, 0.2)
