@@ -71,7 +71,7 @@ sirius_corners=get_SIRIUS_boxCorners(SIRIUS_json)
 
 siriusXiriis_corners=get_corresponding_SIRIUSxIRIIScorners(iriis_corners,sirius_corners)
 
-examples=get_just_few_examples(siriusXiriis_corners)
+#examples=get_just_few_examples(siriusXiriis_corners)
 
 """
 2101408996-20210913T051607 ***** [[[142, 1225, 1189, 101], [53, 69, 751, 740]], [[949, 933, 388, 403], [111, 976, 968, 97]]]
@@ -80,34 +80,38 @@ examples=get_just_few_examples(siriusXiriis_corners)
 2101416472-20210906T114643 ***** [[[532, 1197, 1178, 522], [205, 204, 715, 753]], [[814, 824, 424, 414], [421, 927, 941, 431]]]
 2101416518-20210906T113736 ***** [[[510, 1180, 1168, 507], [203, 194, 713, 754]], [[812, 833, 431, 413], [415, 921, 940, 429]]]
 """
-transformation_examples_path=r"D:\transformation_examples"
+transformation_examples_path=r"D:\FINAL DATASET\wuerth_iriis"
 saved_examples_path=r"D:\saved_examples"
 
 height_dif = 1024 - 800
 width_diff = 1360 - 1280
 
-def resize_images_and_save(path, saving_path):
+def resize_images_and_save(path, saving_path,corners):
     images=os.listdir(path)
 
-    for im in images:
-        image_path=path+"\\"+im
-        img1 = Image.open(image_path)
-        img=img1
-        # IRIIS DIMS : (800, 1280, 3)  ;; SIRIUS DIMS : (1024, 1360, 3)  --- DIMS ARE ( HEIGHT, WIDTH)
-        extension = im[-9:]
-        if(extension=="iriis.jpg"):
+    for im in images:  # IRIIS DIMS : (800, 1280, 3)  ;; SIRIUS DIMS : (1024, 1360, 3)  --- DIMS ARE ( HEIGHT, WIDTH)
+        id=im.split("_")[0]
+        timestamp = id.split("-")[1]
+        if (id[0] == "4"):
+            id = id.split("-")[0][:-1] + "-" + timestamp  # id examle now : 4100010332-20210907T053847 # len(4100010332)=10 :)
+        if id in corners:
+            image_path = path + "\\" + im
+            img1 = Image.open(image_path)
+            img = img1
+
             img2 = img1.crop((0, 0, 1280, 800))
             rect = Image.new("RGB", (1360, 1024))
             Image.Image.paste(rect, img2, (0, 0))
             #draw.rectangle((0, 0, 1360, 1024), fill='green')
             img=rect
+            filename = saving_path + "\\" + im
+            img.save(filename)
         #dimensions = img.shape
         #print(dimensions)
-        filename=saving_path+"\\"+im
-        img.save(filename)
 
 
-resize_images_and_save(transformation_examples_path, saved_examples_path)
+
+resize_images_and_save(transformation_examples_path, saved_examples_path,sirius_corners)
 
 # now work with saved images ===> folder : saved_examples_path=r"D:\saved_examples
 wd=saved_examples_path
@@ -129,9 +133,9 @@ def draw_sirius_corners_on_iriis_image(path,corners_dict):
         if(extension=="iriis.jpg"):
             image_path = path + "\\" + im
             id=im.split("_")[0]
-            #timestamp = id.split("-")[1]
-            #if (id[0] == "4"):
-            #    id = id.split("-")[0][:-1] + "-" + timestamp  # id examle now : 4100010332-20210907T053847 # len(4100010332)=10 :)
+            timestamp = id.split("-")[1]
+            if (id[0] == "4"):
+                id = id.split("-")[0][:-1] + "-" + timestamp  # id examle now : 4100010332-20210907T053847 # len(4100010332)=10 :)
 
             if id in corners_dict:
                 sirius_edges=corners_dict[id][1]
@@ -170,8 +174,8 @@ def draw_sirius_corners_on_iriis_image(path,corners_dict):
             matrix = cv2.getPerspectiveTransform(pts1, pts2)
             img= cv2.warpPerspective(img, matrix, (img.shape[1], img.shape[0]))
 
-            filename = path + "\\" + "edges_" + im
+            filename = path + "\\"  + im
             cv2.imwrite(filename, img)
 
 
-draw_sirius_corners_on_iriis_image(wd,examples)
+draw_sirius_corners_on_iriis_image(wd,siriusXiriis_corners)
