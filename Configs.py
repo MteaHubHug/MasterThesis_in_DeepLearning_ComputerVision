@@ -78,3 +78,6 @@ class SharedConfigurations():
         #self.augumented_examples_path=r"G:\Matea\Augumented_examples"
         self.augumented_examples_path = r"D:\Augumented_examples" # disk D
 
+    # IRIIS and SIRIUS json files - for corner detector (box corners annotations)
+        self.IRIIS_json = open('IRIIS Dataset.json', 'r')
+        self.SIRIUS_json = open('SIRIUS Dataset.json', 'r')
