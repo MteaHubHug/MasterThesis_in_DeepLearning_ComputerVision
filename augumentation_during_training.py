@@ -73,8 +73,7 @@ def get_layer_output(layer):
     otp = layer.output
     get_layer_output_via_K = K.function([inp], [otp])
 
-    for images, _ in dataset_train.take(1):
-        rnd_batch = images
+    rnd_batch, _ = next(iter(dataset_train.take(1)))
 
     lay_otp = get_layer_output_via_K(rnd_batch)
     lay_otp = lay_otp[0]
