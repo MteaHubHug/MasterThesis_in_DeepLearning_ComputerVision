@@ -5,8 +5,8 @@ import shutil
 
 import cv2
 import numpy as np
-
-
+from Configs import SharedConfigurations
+conf=SharedConfigurations()
 sirius_path1=r"G:\Matea\FINAL_DATASET\wuerth_sirius"
 sirius_path2=r"G:\Matea\umschlihtung_filtered_images"
 path_sirius_color=r"D:\FINAL DATASET\wuerth_sirius"
@@ -96,3 +96,37 @@ ids_sirius=get_ids_sirius(path_sirius_color) ## 16656 sirius color images
 matches=get_matches(ids_iriis,ids_sirius) #1132
 
 copy_images_for_anotations(path_sirius_color,wuetrh_sirius_annotate_path,matches)
+
+IRIIS_json=conf.IRIIS_json
+iriis_original_folder=r"D:\FINAL DATASET\wuerth_iriis"
+iriis_annotate_folder=r"D:\FINAL DATASET\wuerth_iriis_annotate"
+
+def get_IRIIS_annotated_images(input_file):
+    json_decode = json.load(input_file)
+    ids=[]
+    for filename in json_decode["_via_img_metadata"]:
+        id = json_decode["_via_img_metadata"][filename]["filename"].split("/")[1].split("_")[0]  # id example : 41000103322-20210907T053847  # len(41000103322)=11 :(
+        timestamp=id.split("-")[1]
+        if(id[0]=="4"):
+            id=id.split("-")[0][:-1]+"-"+timestamp  # id examle now : 4100010332-20210907T053847 # len(4100010332)=10 :)
+        regions = json_decode["_via_img_metadata"][filename]["regions"]
+        if (len(regions) > 0):
+           ids.append(id)
+    return  ids
+
+def copy_annotated_images(old_path,new_path,ids):
+    images=os.listdir(old_path)
+    cnt=0
+    for image in images:
+        id=image.split("_")[0]
+        if id in ids:
+            cnt+=1
+            print(id)
+            old_name=old_path + "\\" + image
+            new_name= new_path + "\\" + image
+            shutil.copy(old_name,new_name)
+    print(cnt)
+
+#annotated=get_IRIIS_annotated_images(IRIIS_json)
+#copy_annotated_images(iriis_original_folder,iriis_annotate_folder,annotated)
+

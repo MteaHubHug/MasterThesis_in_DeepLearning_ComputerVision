@@ -7,6 +7,11 @@ import numpy as np
 from math import atan2, degrees
 from Configs import SharedConfigurations
 from PIL import Image, ImageDraw
+import pickle
+import glob
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
 configs=SharedConfigurations()
 
 IRIIS_json=configs.IRIIS_json
@@ -223,10 +228,10 @@ def resize_and_save_images(path,corners_dict):
 
 
 ##################################################################################
-iriis_corners=get_IRIIS_boxCorners(IRIIS_json)
-sirius_corners=get_SIRIUS_boxCorners(SIRIUS_json)
+#iriis_corners=get_IRIIS_boxCorners(IRIIS_json)
+#sirius_corners=get_SIRIUS_boxCorners(SIRIUS_json)
 
-siriusXiriis_corners=get_corresponding_SIRIUSxIRIIScorners(iriis_corners,sirius_corners)
+#siriusXiriis_corners=get_corresponding_SIRIUSxIRIIScorners(iriis_corners,sirius_corners)
 
 #examples=get_just_few_examples(siriusXiriis_corners)
 
@@ -241,4 +246,20 @@ saved_examples_path=r"D:\saved_examples"
 #crop_and_save(saved_examples_path,siriusXiriis_corners)
 
 
-resize_and_save_images(saved_examples_path,siriusXiriis_corners)
+#resize_and_save_images(saved_examples_path,siriusXiriis_corners)
+
+
+undistortion_path=r"D:\undistortion"
+
+def undistort_images(path):
+    images=os.listdir(path)
+
+    ############add code for undistortion !!!!!
+    for im in images:
+        image_path=path+"\\"+im
+        img=cv2.imread(image_path)
+
+
+
+
+undistort_images(undistortion_path)
