@@ -38,8 +38,38 @@ json_dict = json.load(JSON)
 # Set up a dictionary, mapping all the ground-truth information
 # with respect to the path of the image.
 
+def convert_dict(json_dict):
+    imdir = r"D:\FINAL DATASET\wuerth_iriis_annotate"
+    new_dict={}
+    files=os.listdir(imdir)
+    for file in files:
+        inner_dict={}
+        filename="wuerth_iriis/" + file + "-1"
+        xs = json_dict["_via_img_metadata"][filename]["regions"][0]["shape_attributes"]["all_points_x"]
+        ys = json_dict["_via_img_metadata"][filename]["regions"][0]["shape_attributes"]["all_points_y"]
+
+        p1 = [xs[0],ys[0],1]
+        p2 = [xs[1],ys[1],1]
+        p3 = [xs[2],ys[2],1]
+        p4 = [xs[3],ys[3],1]
+        keypoints= [p1,p2,p3,p4]
+
+        img_path = IMG_DIR + "\\" + file
+        img_data = plt.imread(img_path)
+        # If the image is RGBA convert it to RGB.
+        if img_data.shape[-1] == 4:
+            img_data = img_data.astype(np.uint8)
+            img_data = Image.fromarray(img_data)
+            img_data = np.array(img_data.convert("RGB"))
+
+        inner_dict["joints"]=keypoints
+        inner_dict["img_data"]=img_data
+        new_dict[file]=inner_dict
+    return new_dict
+
+
 # Utility for reading an image and for getting its annotations.
-def get_box(name,json_dict,img_dir): # name example : "2101476929-20210908T080118_iriis.jpg"
+def get_box1(name,json_dict,img_dir): # name example : "2101476929-20210908T080118_iriis.jpg"
     filename="wuerth_iriis/" + name + "-1"
     xs=json_dict["_via_img_metadata"][filename]["regions"][0]["shape_attributes"]["all_points_x"]
     ys=json_dict["_via_img_metadata"][filename]["regions"][0]["shape_attributes"]["all_points_y"]
@@ -72,7 +102,7 @@ def visualize_few_examples(samples,json_dict):
     images=samples
     for im in images:
         fname=im  #### fname example : "2101476929-20210908T080118_iriis.jpg"
-        img, keypoints= get_box(fname,json_dict,IMG_DIR)
+        img, keypoints= get_box1(fname,json_dict,IMG_DIR)
         new_keypoints=  transform_keypoints(img,keypoints)
 
         p1=new_keypoints[0]
@@ -89,15 +119,28 @@ def visualize_few_examples(samples,json_dict):
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-def get_samples(img_dir,json_dict):
+def get_samples(img_dir):
     samples=os.listdir(img_dir)
     num_samples = 4
     selected_samples = np.random.choice(samples, num_samples, replace=False)
     #print(selected_samples)
     return samples, selected_samples
 
-samples, selected_samples= get_samples(IMG_DIR,json_dict)
-#visualize_few_examples(selected_samples,json_dict)
+
+def visual(samples,new_dict):
+    for file in samples:
+        img=new_dict[file]["img_data"]
+        imgplot = plt.imshow(img)
+        plt.show()
+
+json_dict2=convert_dict(json_dict)
+samples, selected_samples= get_samples(IMG_DIR)
+##########visualize_few_examples(selected_samples,json_dict)
+#visual(selected_samples,json_dict2)
+
+def get_box(name):
+    data = json_dict2[name]
+    return data
 
 
 #########################################################################################################
@@ -158,13 +201,14 @@ class KeyPointsDataset(keras.utils.Sequence):
                 kp_temp.append(np.nan_to_num(keypoint.y))
 
             # More on why this reshaping later.
-            batch_keypoints[i,] = np.array(kp_temp).reshape(1, 1, 24 * 2)
+            batch_keypoints[i,] = np.array(kp_temp).reshape(1, 1, 4 * 2)
 
         # Scale the coordinates to [0, 1] range.
         batch_keypoints = batch_keypoints / IMG_SIZE
 
         return (batch_images, batch_keypoints)
 
+############################################### augumentation ###########################################
 train_aug = iaa.Sequential(
     [
         iaa.Resize(IMG_SIZE, interpolation="linear"),
@@ -191,10 +235,10 @@ print(f"Total batches in training set: {len(train_dataset)}")
 print(f"Total batches in validation set: {len(validation_dataset)}")
 
 sample_images, sample_keypoints = next(iter(train_dataset))
-assert sample_keypoints.max() == 1.0
-assert sample_keypoints.min() == 0.0
+#assert sample_keypoints.max() == 1.0
+#assert sample_keypoints.min() == 0.0
 
-sample_keypoints = sample_keypoints[:4].reshape(-1, 24, 2) * IMG_SIZE
+sample_keypoints = sample_keypoints[:4].reshape(-1, 4, 2) * IMG_SIZE
 #################################################################################
 ############### model build #####################################################
 #################################################################################
@@ -230,7 +274,7 @@ model.fit(train_dataset, validation_data=validation_dataset, epochs=EPOCHS)
 ################################################################################
 #################################### predictions : #############################
 ################################################################################
-sample_val_images, sample_val_keypoints = next(iter(validation_dataset))
-sample_val_images = sample_val_images[:4]
-sample_val_keypoints = sample_val_keypoints[:4].reshape(-1, 24, 2) * IMG_SIZE
-predictions = model.predict(sample_val_images).reshape(-1, 24, 2) * IMG_SIZE
+#sample_val_images, sample_val_keypoints = next(iter(validation_dataset))
+#sample_val_images = sample_val_images[:4]
+#sample_val_keypoints = sample_val_keypoints[:4].reshape(-1, 24, 2) * IMG_SIZE
+#predictions = model.predict(sample_val_images).reshape(-1, 24, 2) * IMG_SIZE 
