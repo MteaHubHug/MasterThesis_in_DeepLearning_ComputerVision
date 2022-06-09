@@ -24,7 +24,7 @@ import os
 
 IMG_SIZE = 224
 BATCH_SIZE = 64
-EPOCHS = 5
+EPOCHS = 200
 NUM_KEYPOINTS = 4 * 2  # 4 pairs each having x and y coordinates
 
 IMG_DIR = conf.annotated_IRIIS_images_folder
@@ -274,7 +274,24 @@ model.fit(train_dataset, validation_data=validation_dataset, epochs=EPOCHS)
 ################################################################################
 #################################### predictions : #############################
 ################################################################################
-#sample_val_images, sample_val_keypoints = next(iter(validation_dataset))
-#sample_val_images = sample_val_images[:4]
-#sample_val_keypoints = sample_val_keypoints[:4].reshape(-1, 24, 2) * IMG_SIZE
-#predictions = model.predict(sample_val_images).reshape(-1, 24, 2) * IMG_SIZE 
+sample_val_images, sample_val_keypoints = next(iter(validation_dataset))
+sample_val_images = sample_val_images[:4]
+sample_val_keypoints = sample_val_keypoints[:4].reshape(-1, 4, 2) * IMG_SIZE
+predictions = model.predict(sample_val_images).reshape(-1, 4, 2) * IMG_SIZE
+
+def visual_results(samples,keypoints):
+    i=0
+    for img in samples:
+        p1 = keypoints[i][0]
+        p2 = keypoints[i][1]
+        p3 = keypoints[i][2]
+        p4 = keypoints[i][3]
+        plt.plot(p1[0], p1[1], marker='v', color="green")
+        plt.plot(p2[0], p2[1], marker='v', color="green")
+        plt.plot(p3[0], p3[1], marker='v', color="green")
+        plt.plot(p4[0], p4[1], marker='v', color="gre en")
+        plt.imshow(img)
+        plt.show()
+        i+=1
+
+visual_results(sample_val_images,predictions  )
