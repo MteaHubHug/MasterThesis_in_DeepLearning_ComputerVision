@@ -12,7 +12,8 @@ def get_train_files(lines):
     train_files = []
     for ctr, filnam in enumerate(lines):
         #filename = filnam.split("/")[6][0:-1]
-        filename = filnam.split("\\")[4][0:-1]
+        #filename = filnam.split("\\")[4][0:-1]
+        filename=filnam.split("/")[5][0:-1]
         #print(filename)
         train_files.append(filename)
     return  train_files
@@ -22,7 +23,8 @@ def get_valid_files(lines):
     valid_files = []
     for ctr, filnam in enumerate(lines):
         #filename = filnam.split("/")[6][0:-1]
-        filename=filnam.split("\\")[4][0:-1]
+        #filename=filnam.split("\\")[4][0:-1]
+        filename=filnam.split("/")[5][0:-1]
         #print(filename)
         valid_files.append(filename)
     return  valid_files

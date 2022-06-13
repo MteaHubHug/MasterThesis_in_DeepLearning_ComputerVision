@@ -25,10 +25,10 @@ def copy_sirius_color_images(old_path,new_path):
 
 #copy_sirius_color_images(sirius_path2,path_sirius_color)
 
-path_krdis=r"G:\Matea\FINAL_DATASET\wuerth_sirius"
-input_file=open('IRIIS Dataset.json', 'r+')
+#path_krdis=r"G:\Matea\FINAL_DATASET\wuerth_sirius"
+#input_file=open('IRIIS Dataset.json', 'r+')
 
-wuetrh_sirius_annotate_path=r"D:\FINAL DATASET\wuerth_sirius_annotate"
+#wuetrh_sirius_annotate_path=r"D:\FINAL DATASET\wuerth_sirius_annotate"
 
 def get_ids_iriis(input_file):
     json_decode = json.load(input_file)
@@ -90,16 +90,16 @@ def copy_images_for_anotations(sirius_path,sirius_annotations_path,matches):
 
 
 
-ids_iriis=get_ids_iriis(input_file) #1401 annotated iriis images!
-ids_sirius=get_ids_sirius(path_sirius_color) ## 16656 sirius color images
+#ids_iriis=get_ids_iriis(input_file) #1401 annotated iriis images!
+#ids_sirius=get_ids_sirius(path_sirius_color) ## 16656 sirius color images
 
-matches=get_matches(ids_iriis,ids_sirius) #1132
+#matches=get_matches(ids_iriis,ids_sirius) #1132
 
-copy_images_for_anotations(path_sirius_color,wuetrh_sirius_annotate_path,matches)
+#copy_images_for_anotations(path_sirius_color,wuetrh_sirius_annotate_path,matches)
 
-IRIIS_json=conf.IRIIS_json
+#IRIIS_json=conf.IRIIS_json
 iriis_original_folder=r"D:\FINAL DATASET\wuerth_iriis"
-iriis_annotate_folder=r"D:\FINAL DATASET\wuerth_iriis_annotate"
+#iriis_annotate_folder=r"D:\FINAL DATASET\wuerth_iriis_annotate"
 
 def get_IRIIS_annotated_images(input_file):
     json_decode = json.load(input_file)
@@ -114,7 +114,7 @@ def get_IRIIS_annotated_images(input_file):
            ids.append(id)
     return  ids
 
-def copy_annotated_images(old_path,new_path,ids):
+def copy_selected_images(old_path,new_path,ids):
     images=os.listdir(old_path)
     cnt=0
     for image in images:
@@ -128,5 +128,25 @@ def copy_annotated_images(old_path,new_path,ids):
     print(cnt)
 
 #annotated=get_IRIIS_annotated_images(IRIIS_json)
-#copy_annotated_images(iriis_original_folder,iriis_annotate_folder,annotated)
+#copy_selected_images(iriis_original_folder,iriis_annotate_folder,annotated)
 
+########################################################################################################
+########################################################################################################
+
+def get_not_annotated_images(input_file):
+    json_decode = json.load(input_file)
+    ids=[]
+    for filename in json_decode["_via_img_metadata"]:
+        id = json_decode["_via_img_metadata"][filename]["filename"].split("/")[1].split("_")[0]  # id example : 41000103322-20210907T053847  # len(41000103322)=11 :(
+        timestamp=id.split("-")[1]
+        if(id[0]=="4"):
+            id=id.split("-")[0][:-1]+"-"+timestamp  # id examle now : 4100010332-20210907T053847 # len(4100010332)=10 :)
+        regions = json_decode["_via_img_metadata"][filename]["regions"]
+        if (len(regions) == 0):
+           ids.append(id)
+    return  ids
+
+input_file=conf.IRIIS_json
+not_annotated_iriis_path=conf.not_annotated_IRIIS_images_folder
+not_annotated=get_not_annotated_images(input_file)
+copy_selected_images(iriis_original_folder,not_annotated_iriis_path,not_annotated)

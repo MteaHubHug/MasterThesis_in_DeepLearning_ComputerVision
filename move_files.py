@@ -66,13 +66,44 @@ UM_NOK=configs.UM_NOK
 #copied=copy_iriis_images(old_path,path)
 #print(copied)
 
-classes=get_classes(input_file)
+#classes=get_classes(input_file)
 
 #for classs in classes:
 #   print(classs,classes[classs])
 
-moved=move_nok(NV_OK,NV_NOK,classes)
-print(moved)
+#moved=move_nok(NV_OK,NV_NOK,classes)
+#print(moved)
+
+def check_classes(path,input_file): #  ~ delete DAMAGED
+    json_decode = json.load(input_file)
+    classes={}
+    for filename in json_decode["_via_img_metadata"]:
+        id = json_decode["_via_img_metadata"][filename]["filename"].split("/")[1].split("_")[0]
+        classs = json_decode["_via_img_metadata"][filename]["file_attributes"]["classification"]
+        #print(id,classs)
+        classes[id] = classs
+
+    files=os.listdir(path)
+    damaged=[]
+    for file in files:
+        id=file.split("_")[0]
+        if id in classes:
+            classa=classes[id]
+            if(classa=="damaged"):
+                #damaged.append(id)
+                print(id, classes[id])
+                #file_path=path + "\\" + id + "_iriis.jpg"
+                #os.remove(file_path)
+
+
+
+
+
+
+
+#check_classes(UM_OK,input_file)
+#check_classes(UM_OK,input_file)
+
 
 #########18 591  OK ;;;      2 727 NOK     ;;;  21 318 in SUM
 
