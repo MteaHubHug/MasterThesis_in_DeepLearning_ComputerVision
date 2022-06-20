@@ -8,6 +8,9 @@ import imgaug.augmenters as iaa
 from matplotlib import pyplot as plt
 import numpy as np
 import keras
+import shapely
+from shapely.geos import TopologicalError
+from shapely.geometry import Polygon
 from Keypoint_detec_Generator import get_samples
 conf = SharedConfigurations()
 
@@ -134,30 +137,6 @@ validation_dataset, batch_keys = test_data_generation(BATCH_SIZE, samples, test_
 sample_val_images = next(iter(validation_dataset))
 predictions = model.predict(sample_val_images).reshape(-1, 4, 2) * IMG_SIZE
 
-def visual_results(samples,keypoints,save_dir, keys):
-    i=0
-    for img in samples:
-        imname= save_dir + "\\" + keys[i]
-        print(imname)
-        p1 = keypoints[i][0]
-        p2 = keypoints[i][1]
-        p3 = keypoints[i][2]
-        p4 = keypoints[i][3]
-        plt.plot(p1[0], p1[1], marker='v', color="green")
-        plt.plot(p2[0], p2[1], marker='v', color="green")
-        plt.plot(p3[0], p3[1], marker='v', color="green")
-        plt.plot(p4[0], p4[1], marker='v', color="green")
-        plt.imshow(img)
-        #plt.show()
-
-        plt.savefig(imname,dpi=300)
-        plt.close()
-        i+=1
-
-#visual_results(sample_val_images,predictions, RESULTS_DIR ,batch_keys  )
-
-
-
 ######################################################################################################
 ####################################### RESULTS PREPERATION FOR IoU#####################################################
 ######################################################################################################
@@ -166,6 +145,31 @@ def visual_results(samples,keypoints,save_dir, keys):
 sample_ground_truth_keypoints =  ground_truth_keypoints.reshape(-1, 4, 2) * IMG_SIZE
 #sample_ground_truth_keypoints=next(iter(ground_truth_keypoints))
 #sample_ground_truth_keypoints = sample_ground_truth_keypoints.reshape(-1, 4, 2) * IMG_SIZE
+
+
+def polygon_iou(list1, list2):
+    """
+    Intersection over union between two shapely polygons.
+    """
+    polygon_points1 = np.array(list1).reshape(4, 2)
+    poly1 = Polygon(polygon_points1).convex_hull
+    polygon_points2 = np.array(list2).reshape(4, 2)
+    poly2 = Polygon(polygon_points2).convex_hull
+    union_poly = np.concatenate((polygon_points1, polygon_points2))
+    if not poly1.intersects(poly2):  # this test is fast and can accelerate calculation
+        iou = 0
+    else:
+        try:
+            inter_area = poly1.intersection(poly2).area
+            union_area = poly1.area + poly2.area - inter_area
+            # union_area = MultiPoint(union_poly).convex_hull.area
+            if union_area == 0:
+                return 1
+            iou = float(inter_area) / union_area
+        except shapely.geos.TopologicalError:
+            print('shapely.geos.TopologicalError occured, iou set to 0')
+            iou = 0
+    return iou
 
 def get_results(samples,keypoints, keys,ground_truth_keypoints, save_dir):
     i=0
@@ -178,7 +182,7 @@ def get_results(samples,keypoints, keys,ground_truth_keypoints, save_dir):
         p2 = keypoints[i][1]
         p3 = keypoints[i][2]
         p4 = keypoints[i][3]
-        predictions=(p1,p2,p3,p4)
+        predictions=[p1,p2,p3,p4]
 
 
 
@@ -186,7 +190,9 @@ def get_results(samples,keypoints, keys,ground_truth_keypoints, save_dir):
         g2 = ground_truth_keypoints[i][1]
         g3 = ground_truth_keypoints[i][2]
         g4 = ground_truth_keypoints[i][3]
-        ground_truths=(g1,g2,g3,g4)
+        ground_truths=[g1,g2,g3,g4]
+
+        IoU=polygon_iou(ground_truths,predictions)
 
         plt.plot(p1[0], p1[1], marker='v', color="green")
         plt.plot(p2[0], p2[1], marker='v', color="green")
@@ -198,7 +204,7 @@ def get_results(samples,keypoints, keys,ground_truth_keypoints, save_dir):
         plt.plot(g3[0], g3[1], marker='v', color="pink")
         plt.plot(g4[0], g4[1], marker='v', color="pink")
         plt.imshow(img)
-        ####plt.show()
+        ###################plt.show()
 
         plt.savefig(imname,dpi=300)
         plt.close()
@@ -206,12 +212,16 @@ def get_results(samples,keypoints, keys,ground_truth_keypoints, save_dir):
         #print("*********************")
         #print(ground_truths)
         #print(predictions)
+        print(IoU)
         #print("*********************")
 
         i+=1
 
         cnt+=1
-        if(cnt==15): return
+        if(cnt==15):
+            return
 
 
 get_results(sample_val_images,predictions,batch_keys, sample_ground_truth_keypoints ,RESULTS_DIR)
+
+
