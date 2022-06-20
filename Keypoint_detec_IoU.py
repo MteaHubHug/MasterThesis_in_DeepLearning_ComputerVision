@@ -175,6 +175,7 @@ def get_results(samples,keypoints, keys,ground_truth_keypoints, save_dir):
     i=0
     cnt=0
     results=[]
+    IoU_sum=0
     for img in samples:
         imname= save_dir + "\\" + keys[i]
         #print(imname)
@@ -193,7 +194,7 @@ def get_results(samples,keypoints, keys,ground_truth_keypoints, save_dir):
         ground_truths=[g1,g2,g3,g4]
 
         IoU=polygon_iou(ground_truths,predictions)
-
+        IoU_sum+=IoU
         plt.plot(p1[0], p1[1], marker='v', color="green")
         plt.plot(p2[0], p2[1], marker='v', color="green")
         plt.plot(p3[0], p3[1], marker='v', color="green")
@@ -219,9 +220,9 @@ def get_results(samples,keypoints, keys,ground_truth_keypoints, save_dir):
 
         cnt+=1
         if(cnt==15):
-            return
+            return IoU_sum
 
 
-get_results(sample_val_images,predictions,batch_keys, sample_ground_truth_keypoints ,RESULTS_DIR)
+IoU_sum=get_results(sample_val_images,predictions,batch_keys, sample_ground_truth_keypoints ,RESULTS_DIR)
 
 
