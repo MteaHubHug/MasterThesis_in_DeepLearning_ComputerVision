@@ -40,3 +40,28 @@ When you see that accuracy and loss are satisfying,
 Model is defined in "model_definition.py"
 
 For visualizing the results, organize dataset with "separate_train_valid_data.py", then use "prepare_results_validation.py".
+
+# Keypoint Detector 
+
+Keypoint Detector is a feauture for detecting corners of boxes so we can do normalization on dataset. 
+That means that we can detect box - corners and then cut the box and extract just useful information.
+
+For that purpose, one can use "Keypoint_detec_Generator.py" to generate dataset. 
+Keypoint detector - neural network is defined in "Keypoint_detec_model_definition.py". 
+For training and saving models, there is a script "Keypoint_detec_learning.py". 
+Finally, for loading the model, predicting and saving results, I made a little tool called "Keypoint_detec_results.py". 
+All paths, parameters and hyperparameters are initiallized in Configs.py.  
+If dataset is not already parsed and structured, "cornerDetector_dataset_preparation.py" might be useful.
+
+
+
+
+
+
+
+
+
+
+
+
+
