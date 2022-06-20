@@ -92,9 +92,10 @@ class SharedConfigurations():
 
         self.not_annotated_IRIIS_images_folder= r"C:\wuerth_iriis_theRest"
         self.not_annotated_SIRIUS_images_folder = r"D:\FINAL DATASET\wuerth_sirius_theRest"
-        self.keypoint_detector_models_path=r"C:\Keypoint_detec_models"
+        self.keypoint_detector_models_path= "Keypoint_detec_models"
         self.keypoint_detec_model = "keypoint_detector_model.h5"
         self.keypoint_detec_results_path= r"C:\Keypoint_detec_results"
+        self.keypoint_detec_chosen_models = r"C:\Keypoint_detec_best_models"
 
         self.keypoint_detec_IMG_SIZE = 224
         self.keypoint_detec_BATCH_SIZE = 64
