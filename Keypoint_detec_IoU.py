@@ -29,6 +29,7 @@ json_dict = json.load(JSON)
 
 IMG_SIZE = conf.keypoint_detec_IMG_SIZE
 BATCH_SIZE = len(os.listdir(IMG_DIR) ) #############
+AMOUNT = BATCH_SIZE
 NUM_KEYPOINTS = conf.num_keypoints
 
 def get_box(name, images_dict):
@@ -188,8 +189,8 @@ def get_results(samples,keypoints, keys,ground_truth_keypoints, save_dir):
 
         i+=1
 
-        cnt+=1
-        if(cnt==15):
+        cnt += 1
+        if (cnt == AMOUNT):
             return IoU_sum
 
 
@@ -199,13 +200,19 @@ def compare_models(models_path, sample_val_images, batch_keys, sample_groundtrut
     models=os.listdir(models_path)
     IoU_sums={}
     for m in models:
+        print("checking model : ", m)
         model_path=models_path + "\\" + m
         model = keras.models.load_model(model_path)
         predictions = model.predict(sample_val_images).reshape(-1, 4, 2) * IMG_SIZE
         IoU_sum = get_results(sample_val_images, predictions, batch_keys, sample_groundtruth_keypoints, RESULTS_DIR)
+        avg_IoU_m = IoU_sum / AMOUNT
+        print("Average IoU for model : ", m , " is : ", avg_IoU_m)
         IoU_sums[m]=IoU_sum
 
     best_model = max(IoU_sums, key=IoU_sums.get)
+    best_IoU=  IoU_sums[best_model]
+    avg_IoU= best_IoU/  AMOUNT
     print(" Best model is : ", best_model)
+    print(" avg IoU of the best model : ", avg_IoU)
 
 compare_models(chosen_models_path, sample_val_images,batch_keys,sample_ground_truth_keypoints,RESULTS_DIR)
