@@ -87,19 +87,21 @@ class SharedConfigurations():
     # IRIIS and SIRIUS json files - for corner detector (box corners annotations)
         self.IRIIS_json = open('IRIIS Dataset.json', 'r')
         self.SIRIUS_json = open('SIRIUS Dataset.json', 'r')
+        self.IRIISandSIRIUS_json= open('IRIISandSIRIUS Dataset.json', 'r')
         self.annotated_IRIIS_images_folder= r"D:\FINAL DATASET\wuerth_iriis_annotate"
         self.annotated_SIRIUS_images_folder = r"D:\FINAL DATASET\wuerth_sirius_annotate"
+        self.annotated_IRIISxSIRIUS_images_folder = r"D:\FINAL DATASET\wuerth_annotated_all"
 
         self.not_annotated_IRIIS_images_folder= r"C:\wuerth_iriis_theRest"
         self.not_annotated_SIRIUS_images_folder = r"D:\FINAL DATASET\wuerth_sirius_theRest"
         self.keypoint_detector_models_path= "Keypoint_detec_models"
-        self.keypoint_detec_model = "keypoint_detector_model.h5"
+        self.keypoint_detec_model = "new_keypoint_detec.h5"
         self.keypoint_detec_results_path= r"C:\Keypoint_detec_results"
         self.keypoint_detec_chosen_models = r"C:\Keypoint_detec_best_models"
 
         self.keypoint_detec_IMG_SIZE = 224
         self.keypoint_detec_BATCH_SIZE = 64
-        self.keypoint_detec_EPOCHS = 3000
+        self.keypoint_detec_EPOCHS = 5000
         self.num_keypoints= 4 * 2  # 4 pairs each having x and y coordinates
 
 

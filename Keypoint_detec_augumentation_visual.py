@@ -75,8 +75,8 @@ validation_keys = samples
 train_aug = iaa.Sequential(
     [
         iaa.Resize(IMG_SIZE, interpolation="linear"),
-        iaa.Fliplr(0.3),
-        iaa.Flipud(0.15),
+        iaa.Fliplr(0.5),
+        iaa.Flipud(0.5),
         iaa.AddToBrightness((-30, 30)),
         iaa.AddToHue((-50, 50)),
         iaa.GammaContrast((0.5, 2.0)),
@@ -104,7 +104,7 @@ def data_generation(batch_size,  keys ,images_dict, aug):
             for j in range(0, len(current_keypoint)):
                 kps.append(Keypoint(x=current_keypoint[j][0], y=current_keypoint[j][1]))
             # We then project the original image and its keypoint coordinates.
-            current_image = data["img_data"]
+            current_image = data["img_data"].astype(np.uint8)
             kps_obj = KeypointsOnImage(kps, shape=current_image.shape)
             # Apply the augmentation pipeline.
             (new_image, new_kps_obj) =  aug(image=current_image, keypoints=kps_obj)

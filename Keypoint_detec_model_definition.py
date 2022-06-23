@@ -26,3 +26,7 @@ def get_model():
         NUM_KEYPOINTS, kernel_size=3, strides=1, activation="sigmoid"
     )(x)
     return keras.Model(inputs, outputs, name="keypoint_detector")
+
+
+
+

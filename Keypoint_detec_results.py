@@ -1,36 +1,23 @@
-import shutil
-import cv2
-from tensorflow.keras.callbacks import ModelCheckpoint,TensorBoard
 from PIL import Image
-from sklearn.model_selection import train_test_split
-import imgaug
-from tensorflow import keras
-from tensorflow.keras import layers
-import tensorflow as tf
 from imgaug.augmentables.kps import KeypointsOnImage
 from imgaug.augmentables.kps import Keypoint
-import pandas as pd
 import json
 import os
-
 from Configs import SharedConfigurations
 import imgaug.augmenters as iaa
 from matplotlib import pyplot as plt
 import numpy as np
 import keras
-
-from Keypoint_detec_Generator import KeyPointsDataset
 from Keypoint_detec_Generator import get_samples
-from Keypoint_detec_Generator import get_box
 conf = SharedConfigurations()
 
-#################IMG_DIR=  r"D:\FINAL DATASET\wuerth_iriis_theRest"
-IMG_DIR = conf.not_annotated_IRIIS_images_folder
+IMG_DIR=  r"D:\FINAL DATASET\wuerth_iriis_theRest"
+####IMG_DIR = conf.not_annotated_IRIIS_images_folder
 TEST_DATASET_PATH = IMG_DIR
 
 RESULTS_DIR= conf.keypoint_detec_results_path
 JSON = conf.IRIIS_json
-results_path=conf.keypoint_detector_models_path
+results_path=conf.keypoint_detector_models_path  ##############r"C:\Keypoint_detec_results"
 model_path= conf.keypoint_detec_model
 
 json_dict = json.load(JSON)
@@ -39,15 +26,21 @@ IMG_SIZE = conf.keypoint_detec_IMG_SIZE
 BATCH_SIZE = len(os.listdir(IMG_DIR) ) #############
 NUM_KEYPOINTS = conf.num_keypoints
 
+def get_box(name, images_dict):
+    data = images_dict[name]
+    return data
+
 def get_test_dict(json_dict,test_dir):
+    cnt=0
     new_dict={}
     files=os.listdir(test_dir)
     for file in files:
+        if(cnt%100==0): print(cnt)
         inner_dict={}
         filename="wuerth_iriis/" + file + "-1"
         regions = json_dict["_via_img_metadata"][filename]["regions"]
         if (len(regions)==0):
-            p1 = [1, 1, 1]
+            p1 = [0, 0, 0]
             keypoints = [p1, p1, p1, p1]
 
             img_path = IMG_DIR + "\\" + file
@@ -61,6 +54,7 @@ def get_test_dict(json_dict,test_dir):
             inner_dict["joints"]=keypoints
             inner_dict["img_data"]=img_data
             new_dict[file]=inner_dict
+        cnt+=1
     return new_dict
 
 test_dict=get_test_dict(json_dict,TEST_DATASET_PATH)
@@ -71,8 +65,6 @@ samples, selected_samples = get_samples(IMG_DIR)
 
 np.random.shuffle(samples)
 validation_keys = samples
-
-
 test_aug = iaa.Sequential([iaa.Resize(IMG_SIZE, interpolation="linear")])
 
 def test_data_generation(batch_size,  keys ,images_dict, aug):
@@ -101,8 +93,6 @@ def test_data_generation(batch_size,  keys ,images_dict, aug):
         return (batch_images, batch_keypoints) , batch_keys
 
 validation_dataset , batch_keys = test_data_generation(BATCH_SIZE,samples,test_dict,test_aug )
-
-
 sample_val_images = next(iter(validation_dataset))
 predictions = model.predict(sample_val_images).reshape(-1, 4, 2) * IMG_SIZE
 
@@ -127,5 +117,4 @@ def visual_results(samples,keypoints,save_dir, keys):
         i+=1
 
 visual_results(sample_val_images,predictions, RESULTS_DIR ,batch_keys  )
-
 

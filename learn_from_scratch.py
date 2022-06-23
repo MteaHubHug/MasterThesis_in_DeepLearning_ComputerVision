@@ -115,7 +115,7 @@ if __name__ == '__main__':
 
         model.layers[base_id].trainable = True
         for ctr,layer in enumerate(model.layers[base_id].layers):
-            if not isinstance(layer,BatchNormalization) and ctr >= 221:
+            if not isinstance(layer,BatchNormalization) and ctr >= 221: # change this ==> find the one that is close to the end
                 layer.trainable = True
             else:
                 layer.trainable = False

@@ -16,20 +16,26 @@ BATCH_SIZE = conf.keypoint_detec_BATCH_SIZE
 EPOCHS = conf.keypoint_detec_EPOCHS
 NUM_KEYPOINTS = conf.num_keypoints
 
-IMG_DIR = conf.annotated_IRIIS_images_folder
-JSON = conf.IRIIS_json
+IMG_DIR = conf.annotated_IRIISxSIRIUS_images_folder
 
 samples, selected_samples = get_samples(IMG_DIR)
+
 
 train_aug = iaa.Sequential(
     [
         iaa.Resize(IMG_SIZE, interpolation="linear"),
-        iaa.Fliplr(0.3),
+        iaa.Fliplr(0.5),
+        iaa.Flipud(0.5),
+        iaa.AddToBrightness((-30, 30)),
+        iaa.AddToHue((-50, 50)),
+        iaa.GammaContrast((0.5, 2.0)),
+        iaa.AddToSaturation((-50, 50)),
         # `Sometimes()` applies a function randomly to the inputs with
         # a given probability (0.3, in this case).
-        iaa.Sometimes(0.3, iaa.Affine(rotate=10, scale=(0.5, 0.7))),
+        iaa.Sometimes(0.4, iaa.Affine(rotate=(-45,45), scale=(0.5, 0.7))), # don't want to rotate it too much without scaling, might lose keypoints
     ]
 )
+
 test_aug = iaa.Sequential([iaa.Resize(IMG_SIZE, interpolation="linear")])
 
 np.random.shuffle(samples)

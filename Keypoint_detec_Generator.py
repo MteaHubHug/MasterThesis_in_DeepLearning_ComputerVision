@@ -12,8 +12,8 @@ conf = SharedConfigurations()
 IMG_SIZE = conf.keypoint_detec_IMG_SIZE
 BATCH_SIZE = conf.keypoint_detec_BATCH_SIZE
 NUM_KEYPOINTS = conf.num_keypoints
-IMG_DIR = conf.annotated_IRIIS_images_folder
-JSON = conf.IRIIS_json
+IMG_DIR = conf.annotated_IRIISxSIRIUS_images_folder
+JSON = conf.IRIISandSIRIUS_json
 json_dict = json.load(JSON)
 
 
@@ -24,33 +24,50 @@ def get_samples(img_dir):
     # print(selected_samples)
     return samples, selected_samples
 
+
+def get_image_keys(json_dict):
+    keys=json_dict["_via_image_id_list"]
+    all_keys={}
+    for key in keys:
+        orig_key=key
+        if(key[0]=="w"):
+            key=key[13:]
+            key=key[:-2]
+        else:
+            key=key[:-7]
+        #print(key, " *** ", orig_key)
+        all_keys[key]=orig_key
+    return all_keys
+
 def convert_dict(json_dict):
-    imdir = r"D:\FINAL DATASET\wuerth_iriis_annotate"
+    imdir = r"D:\FINAL DATASET\wuerth_annotated_all"
     new_dict={}
     files=os.listdir(imdir)
+    keys=get_image_keys(json_dict)
     for file in files:
         inner_dict={}
-        filename="wuerth_iriis/" + file + "-1"
-        xs = json_dict["_via_img_metadata"][filename]["regions"][0]["shape_attributes"]["all_points_x"]
-        ys = json_dict["_via_img_metadata"][filename]["regions"][0]["shape_attributes"]["all_points_y"]
+        if file in keys:
+            filename=keys[file]
+            xs = json_dict["_via_img_metadata"][filename]["regions"][0]["shape_attributes"]["all_points_x"]
+            ys = json_dict["_via_img_metadata"][filename]["regions"][0]["shape_attributes"]["all_points_y"]
 
-        p1 = [xs[0],ys[0],1]
-        p2 = [xs[1],ys[1],1]
-        p3 = [xs[2],ys[2],1]
-        p4 = [xs[3],ys[3],1]
-        keypoints= [p1,p2,p3,p4]
+            p1 = [xs[0],ys[0],1]
+            p2 = [xs[1],ys[1],1]
+            p3 = [xs[2],ys[2],1]
+            p4 = [xs[3],ys[3],1]
+            keypoints= [p1,p2,p3,p4]
 
-        img_path = IMG_DIR + "\\" + file
-        img_data = plt.imread(img_path)
-        # If the image is RGBA convert it to RGB.
-        if img_data.shape[-1] == 4:
-            img_data = img_data.astype(np.uint8)
-            img_data = Image.fromarray(img_data)
-            img_data = np.array(img_data.convert("RGB"))
+            img_path = IMG_DIR + "\\" + file
+            img_data = plt.imread(img_path)
+            # If the image is RGBA convert it to RGB.
+            if img_data.shape[-1] == 4:
+                img_data = img_data.astype(np.uint8)
+                img_data = Image.fromarray(img_data)
+                img_data = np.array(img_data.convert("RGB"))
 
-        inner_dict["joints"]=keypoints
-        inner_dict["img_data"]=img_data
-        new_dict[file]=inner_dict
+            inner_dict["joints"]=keypoints
+            inner_dict["img_data"]=img_data
+            new_dict[file]=inner_dict
     return new_dict
 
 
@@ -101,7 +118,7 @@ class KeyPointsDataset(keras.utils.Sequence):
                 kps.append(Keypoint(x=current_keypoint[j][0], y=current_keypoint[j][1]))
 
             # We then project the original image and its keypoint coordinates.
-            current_image = data["img_data"]
+            current_image = data["img_data"].astype(np.uint8)
             kps_obj = KeypointsOnImage(kps, shape=current_image.shape)
 
             # Apply the augmentation pipeline.
