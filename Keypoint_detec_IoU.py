@@ -1,3 +1,5 @@
+import math
+
 from PIL import Image
 from imgaug.augmentables.kps import KeypointsOnImage
 from imgaug.augmentables.kps import Keypoint
@@ -13,6 +15,8 @@ from shapely.geos import TopologicalError
 from shapely.geometry import Polygon
 from Keypoint_detec_Generator import get_samples
 conf = SharedConfigurations()
+
+######################### NAME OF THE SCRIPT IS IoU, but we are using it for getting average Eucledean Distance
 
 IMG_DIR=  r"D:\FINAL DATASET\wuerth_iriis_annotate"
 ####IMG_DIR = conf.not_annotated_IRIIS_images_folder
@@ -142,11 +146,25 @@ def polygon_iou(list1, list2):
             iou = 0
     return iou
 
+def avg_distance(list1, list2):
+    """
+    Eucledean distance between ground-truth keypoints and predicted
+    """
+    Euc_dist=0
+    dist1=math.dist(list1[0],list2[0])
+    dist2=math.dist(list1[1],list2[1])
+    dist3=math.dist(list1[2],list2[2])
+    dist4=math.dist(list1[3],list2[3])
+    Euc_dist = dist1 + dist2 + dist3 + dist4
+    Euc_dist = Euc_dist / 4
+    return Euc_dist
+
 def get_results(samples,keypoints, keys,ground_truth_keypoints, save_dir):
     i=0
     cnt=0
     results=[]
     IoU_sum=0
+    EucDist_sum=0
     for img in samples:
         imname= save_dir + "\\" + keys[i]
         #print(imname)
@@ -164,8 +182,12 @@ def get_results(samples,keypoints, keys,ground_truth_keypoints, save_dir):
         g4 = ground_truth_keypoints[i][3]
         ground_truths=[g1,g2,g3,g4]
 
-        IoU=polygon_iou(ground_truths,predictions)
-        IoU_sum+=IoU
+        ##########IoU=polygon_iou(ground_truths,predictions)
+        ##########IoU_sum+=IoU
+
+        EucDist= avg_distance(ground_truths,predictions)
+        EucDist_sum+=EucDist
+
         plt.plot(p1[0], p1[1], marker='v', color="green")
         plt.plot(p2[0], p2[1], marker='v', color="green")
         plt.plot(p3[0], p3[1], marker='v', color="green")
@@ -191,7 +213,7 @@ def get_results(samples,keypoints, keys,ground_truth_keypoints, save_dir):
 
         cnt += 1
         if (cnt == AMOUNT):
-            return IoU_sum
+            return EucDist_sum
 
 
 #IoU_sum=get_results(sample_val_images,predictions,batch_keys, sample_ground_truth_keypoints ,RESULTS_DIR)
@@ -199,20 +221,31 @@ def get_results(samples,keypoints, keys,ground_truth_keypoints, save_dir):
 def compare_models(models_path, sample_val_images, batch_keys, sample_groundtruth_keypoints, RESULTS_DIR):
     models=os.listdir(models_path)
     IoU_sums={}
+    EucDist_sums={}
     for m in models:
         print("checking model : ", m)
         model_path=models_path + "\\" + m
         model = keras.models.load_model(model_path)
         predictions = model.predict(sample_val_images).reshape(-1, 4, 2) * IMG_SIZE
-        IoU_sum = get_results(sample_val_images, predictions, batch_keys, sample_groundtruth_keypoints, RESULTS_DIR)
-        avg_IoU_m = IoU_sum / AMOUNT
-        print("Average IoU for model : ", m , " is : ", avg_IoU_m)
-        IoU_sums[m]=IoU_sum
+        #IoU_sum = get_results(sample_val_images, predictions, batch_keys, sample_groundtruth_keypoints, RESULTS_DIR)
+        #avg_IoU_m = IoU_sum / AMOUNT
 
-    best_model = max(IoU_sums, key=IoU_sums.get)
-    best_IoU=  IoU_sums[best_model]
-    avg_IoU= best_IoU/  AMOUNT
-    print(" Best model is : ", best_model)
-    print(" avg IoU of the best model : ", avg_IoU)
+        Eucledean_dist_sum=get_results(sample_val_images, predictions, batch_keys, sample_groundtruth_keypoints, RESULTS_DIR)
+        avg_Eucledean_dist= Eucledean_dist_sum / AMOUNT
+        #print("Average IoU for model : ", m , " is : ", avg_IoU_m)
+        print("Average Eucledean distance for model : ", m , " is ", avg_Eucledean_dist)
+        #IoU_sums[m]=IoU_sum
+        EucDist_sums[m]=Eucledean_dist_sum
+
+    #best_model = max(IoU_sums, key=IoU_sums.get)
+    best_model2 = min(EucDist_sums, key=EucDist_sums.get)
+    #best_IoU=  IoU_sums[best_model]
+    #avg_IoU= best_IoU/  AMOUNT
+
+    best_EucDist= EucDist_sums[best_model2]
+    print(" Best model is : ", best_model2)
+    #print(" avg IoU of the best model : ", avg_IoU)
+
+    #print(" avg Eucledean Distance : ", avg_Eucledean_dist)
 
 compare_models(chosen_models_path, sample_val_images,batch_keys,sample_ground_truth_keypoints,RESULTS_DIR)
