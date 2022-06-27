@@ -6,9 +6,9 @@ import datetime
 disk_path=r"E:\backup"
 krdi_folder=r"E:\krdi_files"
 
-iriis_folder=r"E:\IRIISxSIRIUS\IRIIS\iriis_orig"
+iriis_folder=r"E:\IRIISxSIRIUS\IRIIS_matches"
 sirius_folder=r"E:\IRIISxSIRIUS\SIRIUS"
-
+matches_folder= r"E:\IRIISxSIRIUS\IRIISandSIRIUS_matches"
 def read_csv_files(file_path):
     f = open(file_path)
     flag=0
@@ -146,8 +146,56 @@ def iriis_times(path):
 
 #sirius_infos=sirius_times(krdi_folder)
 #iriis_infos=iriis_times(iriis_folder)
+#####################################################
+###########################################################
+krdis_final_folder=r"E:\MATEA_IVIIxWUERTH\krdis_final"
 
-def find_matches(sirius,iriis):
+def find_mod_time(path):
+    files=os.listdir(path)
+    cnt=0
+    mod_times={}
+    for file in files:
+        if(file!="Thumbs.db"):
+            if(file[-4:]=="krdi"):
+                file_path=path+"\\"+file
+                timemod=os.path.getmtime(file_path)
+                dt_c = datetime.datetime.fromtimestamp(timemod)
+                dt_c=str(dt_c)
+                dtc=dt_c[0:19]
+                y=dtc[0:4]
+                m=dtc[5:7]
+                d=dtc[8:10]
+                h=dtc[11:13]
+                min=dtc[14:16]
+                s=dtc[17:19]
+                timestamp= y + m + d + "T" + h + min + s
+                id=file.split("_")[0] + "_" + file.split("_")[1]
+                mod_times[id]=timestamp
+    return mod_times
+
+#####mod_times=find_mod_time(krdis_final_folder)
+
+def rename_sirius_files(path,mod_times):
+    files=os.listdir(path)
+    cnt=0
+    for file in files:
+        id=file.split("_")[0] + "_" + file.split("_")[1]
+        if id in mod_times:
+            old_name=path + "\\" + file
+            sufix=file.split("_")[2]
+            new= file.split("_")[0] + "_" + mod_times[id] + "_" + sufix
+            new_name= path + "\\" + new
+            os.rename(old_name, new_name)
+            cnt+=1
+            if(cnt%100==0): print(cnt)
+    print(cnt)
+
+
+
+######rename_sirius_files(krdis_final_folder, mod_times)
+######################################################################
+########################################################################
+'''def find_matches(sirius,iriis):
     for sir in sirius:
         sirius_time=sir[1][:-9]
         print("sirius : ", sirius_time)
@@ -156,7 +204,7 @@ def find_matches(sirius,iriis):
     for iri in iriis:
         print("iriiis : ", iri)
 
-#find_matches(sirius_infos,iriis_infos)
+###find_matches(sirius_infos,iriis_infos)'''
 
 
 def get_matches(path_iriis,path_sirius):
@@ -172,7 +220,7 @@ def get_matches(path_iriis,path_sirius):
     for sirius in siriusi:
         timestamp_sirius=sirius.split("_")[1]
         sirius_times.append(timestamp_sirius)
-
+    matches={}
     for iris in iriis_times:
         y_i=int(iris[0:4])
         m_i=int(iris[4:6])
@@ -191,33 +239,62 @@ def get_matches(path_iriis,path_sirius):
             dt_sirius= datetime.datetime(y_s,m_s,d_s,h_s,min_s,s_s)
             tdelta = dt_iriis - dt_sirius
             tdelta=str(tdelta)
-            if(tdelta=="0:00:00" or tdelta=="0:00:01" or tdelta=="0:00:02"  or tdelta=="0:00:03"  or tdelta=="0:00:04" or tdelta=="0:00:05"  ):
+            if(tdelta=="0:00:00" or tdelta=="0:00:01" or tdelta=="0:00:02" or tdelta=="0:00:03" or tdelta=="0:00:04" or tdelta=="0:00:05"  ):
+              cnt+=1
               date_iriis=iris[0:8]
               date_sirius=sirius[0:8]
               if(date_sirius==date_iriis):
-                  print(iris, " *** ", sirius)
+                  matches[iris]=sirius
 
 
     print(cnt)
+    return matches
 
 
-get_matches(iriis_folder,sirius_folder)
-
-
-'''def copy_sirius_march25(orig,dest):
-    ids=os.listdir(orig)
+#matches=get_matches(iriis_folder,sirius_folder)
+def rename_iriis_images(matches,path_iriis,path_sirius,dest):
     cnt=0
-    for id in ids:
-        id_path=orig + "\\" + id
-        files=os.listdir(id_path)
-        for file in files:
-            if(file[-4:]==".jpg"):
-                file_path=id_path + "\\" + file
-                desty=dest + "\\" + file
-                shutil.copy(file_path,desty)
-                cnt+=1
-                if(cnt%20==0): print(cnt)
+    iriises = os.listdir(path_iriis)
+    siriuses=os.listdir(path_sirius)
+    for iris in iriises:
+        timestamp_iriis=iris[:-4]
+        if timestamp_iriis in matches:
+            sirius_timestamp=matches[timestamp_iriis]
+            for sirius in siriuses:
+                timestamp_id=sirius.split("_")[1]
+                if(timestamp_id==sirius_timestamp):
+                    id=sirius.split("_")[0]
+                    old_name_iriis = iriis_folder + "\\" + iris
+                    new_name_iriis= id + "_" + sirius_timestamp +"_iriis.jpg"
+                    new_name_iriis = iriis_folder + "\\" + new_name_iriis
+                    print(old_name_iriis, " *** " , new_name_iriis)
+                    shutil.move(old_name_iriis,new_name_iriis)
+    print(cnt)
 
 
-copy_sirius_march25(date_sirius_path,dest_path)
-'''
+
+
+#rename_iriis_images(matches,iriis_folder,sirius_folder,matches_folder)
+
+
+def copy_matches(path_iriis,path_sirius,dest):
+    iriises=os.listdir(path_iriis)
+    siriuses=os.listdir(path_sirius)
+    cnt=0
+    for iriis in iriises:
+        match_iriis=iriis[0:26]
+        for sirius in siriuses:
+            match_sirius=sirius[0:26]
+            if (match_iriis==match_sirius):
+               cnt+=1
+               old_iriis= path_iriis + "\\" + iriis
+               new_iriis= dest + "\\" + iriis
+               old_sirius= path_sirius + "\\" + sirius
+               new_sirius= dest + "\\" + sirius
+               shutil.copy(old_iriis,new_iriis)
+               shutil.copy(old_sirius,new_sirius)
+
+    print(cnt)
+copy_matches(iriis_folder,sirius_folder,matches_folder)
+
+
