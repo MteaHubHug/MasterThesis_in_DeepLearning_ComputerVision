@@ -12,6 +12,9 @@ from sklearn.utils import class_weight
 from Configs import SharedConfigurations
 from model_definition import Classifier
 
+from prettytable import PrettyTable
+
+
 
 if __name__ == '__main__':
 
@@ -82,12 +85,17 @@ if __name__ == '__main__':
     # performance. After this, the final layers of the efficientnet are unlocked and the model is trained until we reach
     # the max number of iterations.
 
-    tot_iterations = config.tot_iterations
-    iterations_per_epoch = math.ceil(number_of_training_files / batch_size)
-    tot_epochs = math.ceil(tot_iterations / iterations_per_epoch)
-    epochs_base_locked = round(tot_epochs/2)
-    epochs_base_unlocked = round(tot_epochs/2)
+    #tot_iterations = config.tot_iterations
+    #iterations_per_epoch = math.ceil(number_of_training_files / batch_size)
+    #tot_epochs = math.ceil(tot_iterations / iterations_per_epoch)
+    #epochs_base_locked = round(tot_epochs/2)
+    #epochs_base_unlocked = round(tot_epochs/2)
 
+    tot_iterations = 1
+    iterations_per_epoch =1
+    tot_epochs = 1
+    epochs_base_locked =1
+    epochs_base_unlocked = 1
 
     labels = ['OK'] * number_of_training_files + ['NOK'] * number_of_validation_files
     class_weights_dict = class_weight.compute_class_weight(class_weight='balanced', classes=np.unique(labels), y=labels)
@@ -109,6 +117,10 @@ if __name__ == '__main__':
                                                                          layer.name))
 
 
+        #print("\n\n")
+        #unfreeze_layer = model.layers[base_id].get_layer(index=232)
+        #effNet=model.layers[base_id]
+        #effNet.summary()
         model.summary()
 
     model.fit(dataset_train,
@@ -124,7 +136,7 @@ if __name__ == '__main__':
 
         model.layers[base_id].trainable = True
         for ctr,layer in enumerate(model.layers[base_id].layers):
-            if not isinstance(layer,BatchNormalization) and ctr >=  231:
+            if not isinstance(layer,BatchNormalization) and ctr >=  234:
                 layer.trainable = True
             else:
                 layer.trainable = False
