@@ -88,6 +88,7 @@ if __name__ == '__main__':
     epochs_base_locked = round(tot_epochs/2)
     epochs_base_unlocked = round(tot_epochs/2)
 
+
     labels = ['OK'] * number_of_training_files + ['NOK'] * number_of_validation_files
     class_weights_dict = class_weight.compute_class_weight(class_weight='balanced', classes=np.unique(labels), y=labels)
     class_weights_dict = {idx: w for idx, w in zip(range(len(class_weights_dict)), class_weights_dict)}
@@ -100,6 +101,14 @@ if __name__ == '__main__':
         model.layers[base_id].trainable = False
 
         model.compile(optimizer=Adam(learning_rate=1e-4), loss='categorical_crossentropy', metrics=['categorical_accuracy'])
+
+        for idx, layer in enumerate(model.layers[base_id].layers):
+            print('trainable={} idx={} len-idx={} name={}'.format(layer.trainable,
+                                                                         idx,
+                                                                         len(model.layers) - idx,
+                                                                         layer.name))
+
+
         model.summary()
 
     model.fit(dataset_train,
@@ -115,7 +124,7 @@ if __name__ == '__main__':
 
         model.layers[base_id].trainable = True
         for ctr,layer in enumerate(model.layers[base_id].layers):
-            if not isinstance(layer,BatchNormalization) and ctr >= 221: # change this ==> find the one that is close to the end
+            if not isinstance(layer,BatchNormalization) and ctr >=  231:
                 layer.trainable = True
             else:
                 layer.trainable = False
