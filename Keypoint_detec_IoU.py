@@ -1,5 +1,5 @@
 import math
-
+import tensorflow as tf
 from PIL import Image
 from imgaug.augmentables.kps import KeypointsOnImage
 from imgaug.augmentables.kps import Keypoint
@@ -18,17 +18,18 @@ conf = SharedConfigurations()
 
 ######################### NAME OF THE SCRIPT IS IoU, but we are using it for getting average Eucledean Distance
 
-IMG_DIR=  r"D:\FINAL DATASET\wuerth_iriis_annotate"
+#IMG_DIR= conf.annotated_IRIISxSIRIUS_images_folder
+IMG_DIR=r"E:\KEYPOINT_DETECTOR\IRIISxSIRIUS_validation_data_annotated_images"
 ####IMG_DIR = conf.not_annotated_IRIIS_images_folder
 TEST_DATASET_PATH = IMG_DIR
 
 #RESULTS_DIR= conf.keypoint_detec_results_path
-RESULTS_DIR = r"D:\IoU"
-JSON = conf.IRIIS_json
-results_path=conf.keypoint_detector_models_path
+RESULTS_DIR = r"E:\KEYPOINT_DETECTOR\Keypoint_detec_results_groundTruth_predictions_validation"
+JSON = conf.IRIISandSIRIUS_json
+#results_path=conf.keypoint_detector_models_path
 model_path= conf.keypoint_detec_model
-chosen_models_path=conf.keypoint_detec_chosen_models
-
+#chosen_models_path=conf.keypoint_detec_chosen_models
+chosen_models_path=r"C:\Users\lukic4\Desktop\neural_image_enhancer_backup\Keypoint_detector_choosen_models"
 json_dict = json.load(JSON)
 
 IMG_SIZE = conf.keypoint_detec_IMG_SIZE
@@ -40,14 +41,30 @@ def get_box(name, images_dict):
     data = images_dict[name]
     return data
 
+def get_image_keys(json_dict):
+    keys=json_dict["_via_image_id_list"]
+    all_keys={}
+    for key in keys:
+        orig_key=key
+        if(key[0]=="w"):
+            key=key[13:]
+            key=key[:-2]
+        else:
+            size = json_dict["_via_img_metadata"][key]["size"]
+            key=key[:-len(str(size))]
+        #print(key, " *** ", orig_key)
+        all_keys[key]=orig_key
+    return all_keys
+
 def get_test_dict(json_dict,test_dir):
     cnt=0
     new_dict={}
     files=os.listdir(test_dir)
+    keys=get_image_keys(json_dict)
     for file in files:
         if(cnt%100==0): print(cnt)
         inner_dict={}
-        filename="wuerth_iriis/" + file + "-1"
+        filename = keys[file]
         regions = json_dict["_via_img_metadata"][filename]["regions"]
         if (len(regions)>0):
             xs = json_dict["_via_img_metadata"][filename]["regions"][0]["shape_attributes"]["all_points_x"]
@@ -60,7 +77,10 @@ def get_test_dict(json_dict,test_dir):
             keypoints = [p1, p2, p3, p4]
 
             img_path = IMG_DIR + "\\" + file
-            img_data = plt.imread(img_path)
+            #img_data = plt.imread(img_path)
+
+            img_data = tf.keras.preprocessing.image.load_img(img_path)
+            img_data = tf.keras.preprocessing.image.img_to_array(img_data)
             # If the image is RGBA convert it to RGB.
             if img_data.shape[-1] == 4:
                 img_data = img_data.astype(np.uint8)
@@ -76,7 +96,7 @@ def get_test_dict(json_dict,test_dir):
 test_dict=get_test_dict(json_dict,TEST_DATASET_PATH)
 
 
-model = keras.models.load_model(model_path)
+#model = keras.models.load_model(model_path)
 samples, selected_samples = get_samples(IMG_DIR)
 
 np.random.shuffle(samples)
