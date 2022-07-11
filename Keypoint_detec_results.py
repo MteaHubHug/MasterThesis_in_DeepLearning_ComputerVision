@@ -1,4 +1,5 @@
 from PIL import Image
+import tensorflow as tf
 from imgaug.augmentables.kps import KeypointsOnImage
 from imgaug.augmentables.kps import Keypoint
 import json
@@ -11,12 +12,12 @@ import keras
 from Keypoint_detec_Generator import get_samples
 conf = SharedConfigurations()
 
-IMG_DIR=  r"D:\FINAL DATASET\wuerth_iriis_theRest"
+IMG_DIR=  r"E:\KEYPOINT_DETECTOR\IRIISxSIRIUS_test_data"
 ####IMG_DIR = conf.not_annotated_IRIIS_images_folder
 TEST_DATASET_PATH = IMG_DIR
 
 RESULTS_DIR= conf.keypoint_detec_results_path
-JSON = conf.IRIISandSIRIUS_json
+JSON = conf.IRIISandSIRIUS_test_json
 results_path=conf.keypoint_detector_models_path  ############
 model_path= conf.keypoint_detec_model
 
@@ -31,7 +32,7 @@ def get_box(name, images_dict):
        data = images_dict[name]
        return data
     else:
-       print(" File : ", name, " is not in the JSON dictionary")
+       #print(" File : ", name, " is not in the JSON dictionary")
        return -1
 
 def get_image_keys(json_dict):
@@ -43,7 +44,8 @@ def get_image_keys(json_dict):
             key=key[13:]
             key=key[:-2]
         else:
-            key=key[:-7]
+            size = json_dict["_via_img_metadata"][key]["size"]
+            key=key[:-len(str(size))]
         #print(key, " *** ", orig_key)
         all_keys[key]=orig_key
     return all_keys
@@ -64,7 +66,9 @@ def get_test_dict(json_dict,test_dir):
                 keypoints = [p1, p1, p1, p1]
 
                 img_path = IMG_DIR + "\\" + file
-                img_data = plt.imread(img_path)
+                #img_data = plt.imread(img_path)
+                img_data= tf.keras.preprocessing.image.load_img(img_path)
+                img_data = tf.keras.preprocessing.image.img_to_array(img_data)
                 # If the image is RGBA convert it to RGB.
                 if img_data.shape[-1] == 4:
                     img_data = img_data.astype(np.uint8)
@@ -121,7 +125,7 @@ def visual_results(samples,keypoints,save_dir, keys):
     i=0
     for img in samples:
         imname= save_dir + "\\" + keys[i]
-        print(imname)
+        #print(imname)
         p1 = keypoints[i][0]
         p2 = keypoints[i][1]
         p3 = keypoints[i][2]
@@ -132,7 +136,7 @@ def visual_results(samples,keypoints,save_dir, keys):
         plt.plot(p3[0], p3[1], marker='v', color="green")
         plt.plot(p4[0], p4[1], marker='v', color="green")
         plt.imshow(img)
-        plt.show()
+        #plt.show()
 
         plt.savefig(imname,dpi=300)
         plt.close()
@@ -145,7 +149,7 @@ def save_result_keypoints_in_json(samples,keypoints,save_dir, keys):
     results=[]
     for img in samples:
         imname= save_dir + "\\" + keys[i]
-        print(imname)
+        #print(imname)
         p1 = keypoints[i][0]
         p2 = keypoints[i][1]
         p3 = keypoints[i][2]
@@ -163,8 +167,11 @@ def save_result_keypoints_in_json(samples,keypoints,save_dir, keys):
         outfile.write(json_object)
     outfile.close()
 
-#visual_results(sample_val_images,predictions, RESULTS_DIR ,batch_keys  )
-save_result_keypoints_in_json(sample_val_images,predictions, RESULTS_DIR ,batch_keys  )
+visual_results(sample_val_images,predictions, RESULTS_DIR ,batch_keys  )
+
+
+
+#save_result_keypoints_in_json(sample_val_images,predictions, RESULTS_DIR ,batch_keys  )
 
 ''' " "regions": [
         {
