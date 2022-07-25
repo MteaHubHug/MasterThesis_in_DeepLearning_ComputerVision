@@ -6,8 +6,8 @@ conf = SharedConfigurations()
 IMG_SIZE = conf.keypoint_detec_IMG_SIZE
 NUM_KEYPOINTS = conf.num_keypoints
 
-IMG_DIR = conf.annotated_IRIIS_images_folder
-JSON = conf.IRIIS_json
+IMG_DIR = conf.annotated_IRIISxSIRIUS_images_folder
+JSON = conf.IRIISandSIRIUS_json
 
 def get_model():
     # Load the pre-trained weights of MobileNetV2 and freeze the weights

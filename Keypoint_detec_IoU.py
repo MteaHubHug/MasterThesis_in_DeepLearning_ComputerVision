@@ -30,6 +30,7 @@ JSON = conf.IRIISandSIRIUS_json
 model_path= conf.keypoint_detec_model
 #chosen_models_path=conf.keypoint_detec_chosen_models
 chosen_models_path=r"C:\Users\lukic4\Desktop\neural_image_enhancer_backup\Keypoint_detector_choosen_models"
+
 json_dict = json.load(JSON)
 
 IMG_SIZE = conf.keypoint_detec_IMG_SIZE
@@ -77,15 +78,18 @@ def get_test_dict(json_dict,test_dir):
             keypoints = [p1, p2, p3, p4]
 
             img_path = IMG_DIR + "\\" + file
-            #img_data = plt.imread(img_path)
-
-            img_data = tf.keras.preprocessing.image.load_img(img_path)
-            img_data = tf.keras.preprocessing.image.img_to_array(img_data)
-            # If the image is RGBA convert it to RGB.
-            if img_data.shape[-1] == 4:
+            img_data = plt.imread(img_path)
+            tip = np.dtype(img_data[0][0][0])
+            if (tip == np.dtype("float32")):
+                img_data = 255 * img_data  # Now scale by 255
                 img_data = img_data.astype(np.uint8)
-                img_data = Image.fromarray(img_data)
-                img_data = np.array(img_data.convert("RGB"))
+            #img_data = tf.keras.preprocessing.image.load_img(img_path)
+            #img_data = tf.keras.preprocessing.image.img_to_array(img_data)
+            # If the image is RGBA convert it to RGB.
+            #if img_data.shape[-1] == 4:
+            #    img_data = img_data.astype(np.uint8)
+            #    img_data = Image.fromarray(img_data)
+            #    img_data = np.array(img_data.convert("RGB"))
 
             inner_dict["joints"]=keypoints
             inner_dict["img_data"]=img_data
@@ -194,8 +198,6 @@ def get_results(samples,keypoints, keys,ground_truth_keypoints, save_dir):
         p4 = keypoints[i][3]
         predictions=[p1,p2,p3,p4]
 
-
-
         g1 = ground_truth_keypoints[i][0]
         g2 = ground_truth_keypoints[i][1]
         g3 = ground_truth_keypoints[i][2]
@@ -208,15 +210,15 @@ def get_results(samples,keypoints, keys,ground_truth_keypoints, save_dir):
         EucDist= avg_distance(ground_truths,predictions)
         EucDist_sum+=EucDist
 
-        plt.plot(p1[0], p1[1], marker='v', color="green")
-        plt.plot(p2[0], p2[1], marker='v', color="green")
-        plt.plot(p3[0], p3[1], marker='v', color="green")
-        plt.plot(p4[0], p4[1], marker='v', color="green")
+        #plt.plot(p1[0], p1[1], marker='v', color="green")
+        #plt.plot(p2[0], p2[1], marker='v', color="green")
+        #plt.plot(p3[0], p3[1], marker='v', color="green")
+        #plt.plot(p4[0], p4[1], marker='v', color="green")
 
-        plt.plot(g1[0], g1[1], marker='v', color="pink")
-        plt.plot(g2[0], g2[1], marker='v', color="pink")
-        plt.plot(g3[0], g3[1], marker='v', color="pink")
-        plt.plot(g4[0], g4[1], marker='v', color="pink")
+        #plt.plot(g1[0], g1[1], marker='v', color="pink")
+        #plt.plot(g2[0], g2[1], marker='v', color="pink")
+        #plt.plot(g3[0], g3[1], marker='v', color="pink")
+        #plt.plot(g4[0], g4[1], marker='v', color="pink")
         #plt.imshow(img)
         ###################plt.show()
 
@@ -234,6 +236,46 @@ def get_results(samples,keypoints, keys,ground_truth_keypoints, save_dir):
         cnt += 1
         if (cnt == AMOUNT):
             return EucDist_sum
+
+
+
+def get_results_with_visualisation(samples,keypoints, keys,ground_truth_keypoints, save_dir):
+    i=0
+    cnt=0
+    results=[]
+    for img in samples:
+        imname= save_dir + "\\" + keys[i]
+        #print(imname)
+        p1 = keypoints[i][0]
+        p2 = keypoints[i][1]
+        p3 = keypoints[i][2]
+        p4 = keypoints[i][3]
+        predictions=[p1,p2,p3,p4]
+
+        g1 = ground_truth_keypoints[i][0]
+        g2 = ground_truth_keypoints[i][1]
+        g3 = ground_truth_keypoints[i][2]
+        g4 = ground_truth_keypoints[i][3]
+        ground_truths=[g1,g2,g3,g4]
+
+        plt.plot(p1[0], p1[1], marker='v', color="red")
+        plt.plot(p2[0], p2[1], marker='v', color="yellow")
+        plt.plot(p3[0], p3[1], marker='v', color="green")
+        plt.plot(p4[0], p4[1], marker='v', color="blue")
+
+        plt.plot(g1[0], g1[1], marker='o', color="pink")
+        plt.plot(g2[0], g2[1], marker='o', color="orange")
+        plt.plot(g3[0], g3[1], marker='o', color="brown")
+        plt.plot(g4[0], g4[1], marker='o', color="purple")
+        plt.imshow(img)
+        ###################plt.show()
+
+        plt.savefig(imname,dpi=300)
+        plt.close()
+        i+=1
+
+        cnt += 1
+        if (cnt == AMOUNT): return 1
 
 
 #IoU_sum=get_results(sample_val_images,predictions,batch_keys, sample_ground_truth_keypoints ,RESULTS_DIR)
@@ -266,6 +308,10 @@ def compare_models(models_path, sample_val_images, batch_keys, sample_groundtrut
     print(" Best model is : ", best_model2)
     #print(" avg IoU of the best model : ", avg_IoU)
 
-    #print(" avg Eucledean Distance : ", avg_Eucledean_dist)
+    print(" avg Eucledean Distance : ", best_EucDist)
+    best_model_path=conf.keypoint_detec_chosen_models + "\\" + best_model2
+    best_model = keras.models.load_model(best_model_path)
+    predictions = best_model.predict(sample_val_images).reshape(-1, 4, 2) * IMG_SIZE
+    res= get_results_with_visualisation(sample_val_images, predictions, batch_keys, sample_groundtruth_keypoints, RESULTS_DIR)
 
 compare_models(chosen_models_path, sample_val_images,batch_keys,sample_ground_truth_keypoints,RESULTS_DIR)

@@ -1,4 +1,5 @@
 from Configs import SharedConfigurations
+import tensorflow as tf
 from tensorflow import keras
 from imgaug.augmentables.kps import KeypointsOnImage
 from imgaug.augmentables.kps import Keypoint
@@ -59,11 +60,17 @@ def convert_dict(json_dict):
 
             img_path = IMG_DIR + "\\" + file
             img_data = plt.imread(img_path)
-            # If the image is RGBA convert it to RGB.
-            if img_data.shape[-1] == 4:
+            tip = np.dtype(img_data[0][0][0])
+            if (tip == np.dtype("float32")):
+                img_data = 255 * img_data  # Now scale by 255
                 img_data = img_data.astype(np.uint8)
-                img_data = Image.fromarray(img_data)
-                img_data = np.array(img_data.convert("RGB"))
+            #img_data = tf.keras.preprocessing.image.load_img(img_path)
+            #img_data = tf.keras.preprocessing.image.img_to_array(img_data)
+            # If the image is RGBA convert it to RGB.
+            #if img_data.shape[-1] == 4:
+            #    img_data = img_data.astype(np.uint8)
+            #    img_data = Image.fromarray(img_data)
+            #    img_data = np.array(img_data.convert("RGB"))
 
             inner_dict["joints"]=keypoints
             inner_dict["img_data"]=img_data
