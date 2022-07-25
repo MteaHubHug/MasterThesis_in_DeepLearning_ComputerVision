@@ -3,6 +3,8 @@ import tensorflow as tf
 from imgaug.augmentables.kps import KeypointsOnImage
 from imgaug.augmentables.kps import Keypoint
 import json
+from PIL import Image
+import cv2
 import os
 from Configs import SharedConfigurations
 import imgaug.augmenters as iaa
@@ -12,15 +14,10 @@ import keras
 from Keypoint_detec_Generator import get_samples
 conf = SharedConfigurations()
 
-IMG_DIR=  r"E:\KEYPOINT_DETECTOR\IRIISxSIRIUS_test_data"
-####IMG_DIR = conf.not_annotated_IRIIS_images_folder
-TEST_DATASET_PATH = IMG_DIR
-
-RESULTS_DIR= conf.keypoint_detec_results_path
+IMG_DIR=conf.not_annotated_all_data
+RESULTS_DIR= conf.keypoint_detec_results_test_data
 JSON = conf.IRIISandSIRIUS_test_json
-results_path=conf.keypoint_detector_models_path  ############
 model_path= conf.keypoint_detec_model
-
 json_dict = json.load(JSON)
 
 IMG_SIZE = conf.keypoint_detec_IMG_SIZE
@@ -66,14 +63,15 @@ def get_test_dict(json_dict,test_dir):
                 keypoints = [p1, p1, p1, p1]
 
                 img_path = IMG_DIR + "\\" + file
-                #img_data = plt.imread(img_path)
-                img_data= tf.keras.preprocessing.image.load_img(img_path)
-                img_data = tf.keras.preprocessing.image.img_to_array(img_data)
-                # If the image is RGBA convert it to RGB.
-                if img_data.shape[-1] == 4:
+                img_data = plt.imread(img_path)
+                tip = np.dtype(img_data[0][0][0])
+                if (tip == np.dtype("float32")):
+                    img_data = 255 * img_data  # Now scale by 255
                     img_data = img_data.astype(np.uint8)
-                    img_data = Image.fromarray(img_data)
-                    img_data = np.array(img_data.convert("RGB"))
+                #img_data= tf.keras.preprocessing.image.load_img(img_path)
+                #img_data = tf.keras.preprocessing.image.img_to_array(img_data)
+                # If the image is RGBA convert it to RGB.
+
 
                 inner_dict["joints"]=keypoints
                 inner_dict["img_data"]=img_data
@@ -81,7 +79,7 @@ def get_test_dict(json_dict,test_dir):
             cnt+=1
     return new_dict
 
-test_dict=get_test_dict(json_dict,TEST_DATASET_PATH)
+test_dict=get_test_dict(json_dict,IMG_DIR)
 
 
 model = keras.models.load_model(model_path)
@@ -121,25 +119,51 @@ validation_dataset , batch_keys = test_data_generation(BATCH_SIZE,samples,test_d
 sample_val_images = next(iter(validation_dataset))
 predictions = model.predict(sample_val_images).reshape(-1, 4, 2) * IMG_SIZE
 
-def visual_results(samples,keypoints,save_dir, keys):
+def visual_results(samples,keypoints,save_dir, keys,img_dir):
     i=0
     for img in samples:
+        filename= img_dir + "\\" + keys[i]
         imname= save_dir + "\\" + keys[i]
-        #print(imname)
+
+
         p1 = keypoints[i][0]
         p2 = keypoints[i][1]
         p3 = keypoints[i][2]
         p4 = keypoints[i][3]
 
-        plt.plot(p1[0], p1[1], marker='v', color="green")
-        plt.plot(p2[0], p2[1], marker='v', color="green")
-        plt.plot(p3[0], p3[1], marker='v', color="green")
-        plt.plot(p4[0], p4[1], marker='v', color="green")
-        plt.imshow(img)
-        #plt.show()
+        #the_image = cv2.imread(filename)
+        if(keys[i][-9:]=="iriis.jpg"):
+            #the_image=img
+            the_image = Image.open(filename)
+            the_image = the_image.resize((IMG_SIZE,IMG_SIZE))
+            top_left_x = int(p1[0])
+            top_left_y = int(p1[1])
+            bot_right_x = int(p3[0])
+            bot_right_y = int(p3[1])
+            #the_image=the_image[ top_left_y :  bot_right_y  + 1,  top_left_x : bot_right_x  + 1]
+            #cv2.imwrite(imname,the_image)
+            box = (top_left_x, top_left_y, bot_right_x, bot_right_y)
+            img2 = the_image.crop(box)
+            img2= img2.resize((IMG_SIZE, IMG_SIZE))    # comment this line
+            img2.save(imname)
 
-        plt.savefig(imname,dpi=300)
-        plt.close()
+        else:
+            #the_image=img
+            the_image = Image.open(filename)
+            the_image = the_image.resize((IMG_SIZE,IMG_SIZE))
+            top_left_x = int(p4[0])
+            top_left_y = int(p4[1])
+            bot_right_x = int(p2[0])
+            bot_right_y = int(p2[1])
+            #the_image=the_image[ top_left_y :  bot_right_y  + 1,  top_left_x : bot_right_x  + 1]
+            #cv2.imwrite(imname,the_image)
+            box = (top_left_x, top_left_y, bot_right_x, bot_right_y)
+            img2 = the_image.crop(box)
+            img2= img2.resize((IMG_SIZE, IMG_SIZE))   # comment this line
+            img2.save(imname)
+
+
+
         i+=1
 
 
@@ -167,7 +191,7 @@ def save_result_keypoints_in_json(samples,keypoints,save_dir, keys):
         outfile.write(json_object)
     outfile.close()
 
-visual_results(sample_val_images,predictions, RESULTS_DIR ,batch_keys  )
+visual_results(sample_val_images,predictions, RESULTS_DIR ,batch_keys  ,IMG_DIR)
 
 
 
