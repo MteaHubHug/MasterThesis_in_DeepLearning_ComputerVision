@@ -238,7 +238,7 @@ def get_results(samples,keypoints, keys,ground_truth_keypoints, save_dir):
             return EucDist_sum
 
 
-
+#
 def get_results_with_visualisation(samples,keypoints, keys,ground_truth_keypoints, save_dir):
     i=0
     cnt=0

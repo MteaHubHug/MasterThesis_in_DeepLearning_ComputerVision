@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import json
 import os
-
+#
 conf = SharedConfigurations()
 IMG_SIZE = conf.keypoint_detec_IMG_SIZE
 BATCH_SIZE = conf.keypoint_detec_BATCH_SIZE

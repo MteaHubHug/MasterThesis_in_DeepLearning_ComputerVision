@@ -10,7 +10,7 @@ from Keypoint_detec_Generator import KeyPointsDataset
 from Keypoint_detec_Generator import get_samples
 from matplotlib import pyplot as plt
 conf = SharedConfigurations()
-
+#
 IMG_SIZE = conf.keypoint_detec_IMG_SIZE
 BATCH_SIZE = conf.keypoint_detec_BATCH_SIZE
 EPOCHS = conf.keypoint_detec_EPOCHS
