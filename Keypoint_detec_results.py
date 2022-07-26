@@ -136,10 +136,10 @@ def visual_results(samples,keypoints,save_dir, keys,img_dir):
             #the_image=img
             the_image = Image.open(filename)
             the_image = the_image.resize((IMG_SIZE,IMG_SIZE))
-            top_left_x = int(p1[0])
-            top_left_y = int(p1[1])
-            bot_right_x = int(p3[0])
-            bot_right_y = int(p3[1])
+            top_left_x =min( int(p1[0]), int(p2[0]), int(p3[0]),int(p4[0])  )
+            top_left_y =min( int(p1[1]), int(p2[1]), int(p3[1]),int(p4[1])  )
+            bot_right_x = max( int(p1[0]), int(p2[0]), int(p3[0]),int(p4[0])  )
+            bot_right_y = max( int(p1[1]), int(p2[1]), int(p3[1]),int(p4[1])  )
             #the_image=the_image[ top_left_y :  bot_right_y  + 1,  top_left_x : bot_right_x  + 1]
             #cv2.imwrite(imname,the_image)
             box = (top_left_x, top_left_y, bot_right_x, bot_right_y)
@@ -151,10 +151,10 @@ def visual_results(samples,keypoints,save_dir, keys,img_dir):
             #the_image=img
             the_image = Image.open(filename)
             the_image = the_image.resize((IMG_SIZE,IMG_SIZE))
-            top_left_x = int(p4[0])
-            top_left_y = int(p4[1])
-            bot_right_x = int(p2[0])
-            bot_right_y = int(p2[1])
+            top_left_x =min( int(p1[0]), int(p2[0]), int(p3[0]),int(p4[0])  )
+            top_left_y =min( int(p1[1]), int(p2[1]), int(p3[1]),int(p4[1])  )
+            bot_right_x = max( int(p1[0]), int(p2[0]), int(p3[0]),int(p4[0])  )
+            bot_right_y = max( int(p1[1]), int(p2[1]), int(p3[1]),int(p4[1])  )
             #the_image=the_image[ top_left_y :  bot_right_y  + 1,  top_left_x : bot_right_x  + 1]
             #cv2.imwrite(imname,the_image)
             box = (top_left_x, top_left_y, bot_right_x, bot_right_y)
@@ -170,7 +170,7 @@ def visual_results(samples,keypoints,save_dir, keys,img_dir):
 def save_result_keypoints_in_json(samples,keypoints,save_dir, keys):
     i=0
     regions={}
-    results=[]
+    results= {}
     for img in samples:
         imname= save_dir + "\\" + keys[i]
         #print(imname)
@@ -181,21 +181,21 @@ def save_result_keypoints_in_json(samples,keypoints,save_dir, keys):
 
         xs=[   str(p1[0])  ,   str(p2[0])    ,   str(p3[0])    ,    str(p4[0])    ]
         ys=[   str(p1[1])  ,   str(p2[1])    ,   str(p3[1])    ,    str(p4[1])    ]
-        regions["filename"]=keys[i]
+        #regions["filename"]=keys[i]
         regions["all_points_x"]=xs
         regions["all_points_y"]=ys
-        results.append(regions)
+        results[keys[i]]=regions
         i+=1
     json_object = json.dumps(results, indent=4)
     with open("Keypoints_results.json", "w") as outfile:
         outfile.write(json_object)
     outfile.close()
 
-visual_results(sample_val_images,predictions, RESULTS_DIR ,batch_keys  ,IMG_DIR)
+#visual_results(sample_val_images,predictions, RESULTS_DIR ,batch_keys  ,IMG_DIR)
 
 
 
-#save_result_keypoints_in_json(sample_val_images,predictions, RESULTS_DIR ,batch_keys  )
+save_result_keypoints_in_json(sample_val_images,predictions, RESULTS_DIR ,batch_keys  )
 
 ''' " "regions": [
         {
