@@ -15,6 +15,7 @@ config =SharedConfigurations()
 path_train=r"E:\DEPTH_ESTIMATOR\DATASET_train"
 path_validation=r"E:\DEPTH_ESTIMATOR\DATASET_validation"
 path_result_models=config.DEPTH_ESTIMATOR_RESULTS_MODELS
+save_dir=config.DEPTH_ESTIMATOR_RESULTS_DEPTHS
 HEIGHT = 256
 WIDTH = 256
 LR = 0.0002
@@ -40,6 +41,7 @@ def get_data(path):
 data=get_data(path_validation)
 df = pd.DataFrame(data)
 df = df.sample(frac=1, random_state=42)
+
 ########### build  pipeline ###########################
 
 class DataGenerator(tf.keras.utils.Sequence):
@@ -60,6 +62,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         return int(np.ceil(len(self.data) / self.batch_size))
 
     def __getitem__(self, index):
+        filenames=[]
         if (index + 1) * self.batch_size > len(self.indices):
             self.batch_size = len(self.indices) - index * self.batch_size
         # Generate one batch of data
@@ -80,7 +83,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         if self.shuffle == True:
             np.random.shuffle(self.index)
 
-    def load(self, image_path, depath_path ):
+    def load(self, image_path, depth_path ):
         """Load input and target image."""
 
         image_ = cv2.imread(image_path)
@@ -89,7 +92,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         image_ = tf.image.convert_image_dtype(image_, tf.float32)
 
 
-        depth_map = cv2.imread(depath_path)
+        depth_map = cv2.imread(depth_path)
         depth_map = cv2.cvtColor(depth_map, cv2.COLOR_BGR2RGB)
         depth_map = cv2.resize(depth_map, self.dim)
         depth_map = tf.image.convert_image_dtype(depth_map, tf.float32)
@@ -97,7 +100,6 @@ class DataGenerator(tf.keras.utils.Sequence):
         return image_, depth_map
 
     def data_generation(self, batch):
-
         x = np.empty((self.batch_size, *self.dim, self.n_channels))
         y = np.empty((self.batch_size, *self.dim, self.n_channels))
 
@@ -110,7 +112,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         return x, y
 
 
-def visualize_depth_map(samples, test=False, model=None):
+def visualize_depth_map(save_dir,df,samples, test=False, model=None):
     input, target = samples
     cmap = copy.copy(matplotlib.cm.get_cmap("jet"))
     cmap.set_bad(color="black")
@@ -119,12 +121,21 @@ def visualize_depth_map(samples, test=False, model=None):
         pred = model.predict(input)
         #fig, ax = plt.subplots(6, 3, figsize=(50, 50))
         for i in range(4):
+            imname = df._get_value(i, "image", takeable=False)
+            imname= imname.split("\\")[3]
+            imname= save_dir + "\\" + imname
+            print(imname)
+            #imname= save_dir + "\\" + filenames[i]
+            #print(imname)
             #plt.imshow((input[i].squeeze()))
             #plt.show()
             #plt.imshow((target[i].squeeze()), cmap=cmap)
             #plt.show()
+
             plt.imshow((pred[i].squeeze()), cmap=cmap)
-            plt.show()
+            ###plt.show()
+            plt.savefig(imname,dpi=300)
+            plt.close()
     else:
         #fig, ax = plt.subplots(6, 2, figsize=(50, 50))
         for i in range(4):
@@ -133,7 +144,8 @@ def visualize_depth_map(samples, test=False, model=None):
             plt.imshow((target[i].squeeze()), cmap=cmap)
             plt.show()
 
+
 data_gen=DataGenerator(data=df, batch_size=6, dim=(HEIGHT, WIDTH))
 visualize_samples  = next(iter(data_gen))
 
-#visualize_depth_map(visualize_samples)
+visualize_depth_map(save_dir,df,visualize_samples)

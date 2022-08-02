@@ -17,6 +17,7 @@ config =SharedConfigurations()
 path_train=r"E:\DEPTH_ESTIMATOR\DATASET_train"
 path_validation=r"E:\DEPTH_ESTIMATOR\DATASET_validation"
 path_result_models=config.DEPTH_ESTIMATOR_RESULTS_MODELS
+results_dir=config.DEPTH_ESTIMATOR_RESULTS_DEPTHS
 HEIGHT = 256
 WIDTH = 256
 LR = 0.0002
@@ -63,7 +64,7 @@ test_loader = next(
         )
     )
 )
-visualize_depth_map(test_loader, test=True, model=model)
+visualize_depth_map(results_dir,df, test_loader, test=True, model=model)
 
 def get_learning_curves(history):
     # summarize history for loss
