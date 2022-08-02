@@ -8,28 +8,27 @@ import cv2
 import matplotlib
 import copy
 import matplotlib.pyplot as plt
+from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 from Configs import SharedConfigurations
 
 config =SharedConfigurations()
 path_train=r"E:\DEPTH_ESTIMATOR\DATASET_train"
 path_validation=r"E:\DEPTH_ESTIMATOR\DATASET_validation"
-
+path_result_models=config.DEPTH_ESTIMATOR_RESULTS_MODELS
 HEIGHT = 256
 WIDTH = 256
 LR = 0.0002
-EPOCHS = 5 # 30
+EPOCHS = 2
 BATCH_SIZE = 32
 #### get data from folder ##########################
 def get_data(path):
     filelist = []
     files=os.listdir(path )
     for file in files:
-        if(file[-4:]!="krdi"):
+        #if(file[-4:]!="krdi"):
             #print(file)
             file_path=path  + "\\" + file
             filelist.append(file_path)
-
-
     filelist.sort()
     data = {
         "image": [x for x in filelist if x.endswith("-color.png")],
@@ -38,14 +37,10 @@ def get_data(path):
     }
     return data
 
-
 data=get_data(path_validation)
-
 df = pd.DataFrame(data)
 df = df.sample(frac=1, random_state=42)
-
 ########### build  pipeline ###########################
-
 
 class DataGenerator(tf.keras.utils.Sequence):
     def __init__(self, data, batch_size=6, dim=(768, 1024), n_channels=3, shuffle=True):
@@ -112,9 +107,7 @@ class DataGenerator(tf.keras.utils.Sequence):
                 self.data["depth"][batch_id],
                 #self.data["mask"][batch_id],
             )
-
         return x, y
-
 
 
 def visualize_depth_map(samples, test=False, model=None):
@@ -132,7 +125,6 @@ def visualize_depth_map(samples, test=False, model=None):
             #plt.show()
             plt.imshow((pred[i].squeeze()), cmap=cmap)
             plt.show()
-
     else:
         #fig, ax = plt.subplots(6, 2, figsize=(50, 50))
         for i in range(4):
@@ -145,7 +137,6 @@ data_gen=DataGenerator(data=df, batch_size=6, dim=(HEIGHT, WIDTH))
 visualize_samples  = next(iter(data_gen))
 
 #visualize_depth_map(visualize_samples)
-
 
 ##################################################################################################################
 ###################################### BUILD MODEL ############################################################
@@ -178,7 +169,6 @@ class DownscaleBlock(layers.Layer):
         p = self.pool(x)
         return x, p
 
-
 class UpscaleBlock(layers.Layer):
     def __init__(
         self, filters, kernel_size=(3, 3), padding="same", strides=1, **kwargs
@@ -206,7 +196,6 @@ class UpscaleBlock(layers.Layer):
 
         return x
 
-
 class BottleNeckBlock(layers.Layer):
     def __init__(
         self, filters, kernel_size=(3, 3), padding="same", strides=1, **kwargs
@@ -223,7 +212,6 @@ class BottleNeckBlock(layers.Layer):
         x = self.convB(x)
         x = self.reluB(x)
         return x
-
 ################################# LOSS DEFINITION #################################
 
 class DepthEstimationModel(tf.keras.Model):
@@ -330,6 +318,12 @@ optimizer = tf.keras.optimizers.Adam(
     learning_rate=LR,
     amsgrad=False,
 )
+
+callbacks = [
+    ModelCheckpoint(os.path.join(path_result_models, 'depth_estimator/save_at_{epoch}'),save_format="tf"),
+    TensorBoard(log_dir=os.path.join(path_result_models, 'tensorboard'))
+]
+
 model = DepthEstimationModel()
 # Define the loss function
 cross_entropy = tf.keras.losses.SparseCategoricalCrossentropy(
@@ -344,12 +338,12 @@ train_loader = DataGenerator(
 validation_loader = DataGenerator(
     data=df[20:].reset_index(drop="true"), batch_size=BATCH_SIZE, dim=(HEIGHT, WIDTH) # insted of 20 => should be 260
 )
-model.fit(
+history=model.fit(
     train_loader,
     epochs=EPOCHS,
     validation_data=validation_loader,
+    callbacks=callbacks
 )
-
 #################################################################################
 
 test_loader = next(
@@ -360,3 +354,16 @@ test_loader = next(
     )
 )
 visualize_depth_map(test_loader, test=True, model=model)
+
+def get_learning_curves(history):
+    # summarize history for loss
+    plt.plot(history.history['loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.savefig('depth_estimator_loss.png')
+    plt.show()
+    plt.close()
+
+get_learning_curves(history)

@@ -36,7 +36,7 @@ class SharedConfigurations():
 
 
         self.path_training_results = 'TRAINING/results_umschlichtung'
-        self.path_model = 'save_at_65.h5'
+        self.path_model = 'save_at_160.h5'
 
         # result preparation
 
@@ -55,6 +55,8 @@ class SharedConfigurations():
         self.rnd_seed = 48
         self.tot_iterations = 100000
         self.learning_rate=1e-4
+
+        self.layer_change_Trainable2Nontrainable= 221
     # files for keeping track of image names
 
         self.train_images_name_file = 'train_file_names.txt'
@@ -82,30 +84,42 @@ class SharedConfigurations():
         #self.augumented_examples_path=r"G:\Matea\Augumented_examples"
         #self.augumented_examples_path = r"D:\Augumented_examples" # disk D
 ############################################################################################
-########################### CORNER DETECTOR STUFF : ########################################
+########################### KEYPOINT DETECTOR STUFF : ########################################
 
     # IRIIS and SIRIUS json files - for corner detector (box corners annotations)
-        self.IRIIS_json = open('IRIIS Dataset.json', 'r')
-        self.SIRIUS_json = open('SIRIUS Dataset.json', 'r')
-        self.IRIISandSIRIUS_json= open('IRIISandSIRIUS Dataset.json', 'r')
-        self.annotated_IRIIS_images_folder= r"D:\FINAL DATASET\wuerth_iriis_annotate"
-        self.annotated_SIRIUS_images_folder = r"D:\FINAL DATASET\wuerth_sirius_annotate"
+        #self.IRIIS_json = open('IRIIS Dataset.json', 'r')
+        #self.SIRIUS_json = open('SIRIUS Dataset.json', 'r')
+        self.IRIISandSIRIUS_json= open('IRIISandSIRIUS_forKeypoint.json', 'r')  #IRIISandSIRIUS Dataset.json
+        self.IRIISandSIRIUS_test_json = open('IRIISxSIRIUS_TEST_DATASET_ALL_44258_entries.json','r')
+        #self.annotated_IRIIS_images_folder= r"D:\FINAL DATASET\wuerth_iriis_annotate"
+        #self.annotated_SIRIUS_images_folder = r"D:\FINAL DATASET\wuerth_sirius_annotate"
         self.annotated_IRIISxSIRIUS_images_folder = r"D:\FINAL DATASET\wuerth_annotated_all"
+        ##self.annotated_IRIISxSIRIUS_images_folder = r"/home/matea/Keypoint detector/KEYPOINT_DETECTOR\KeypointDetectordataset"
 
-        self.not_annotated_IRIIS_images_folder= r"C:\wuerth_iriis_theRest"
-        self.not_annotated_SIRIUS_images_folder = r"D:\FINAL DATASET\wuerth_sirius_theRest"
-        self.keypoint_detector_models_path= "Keypoint_detec_models"
-        self.keypoint_detec_model = "new_keypoint_detec.h5"
-        self.keypoint_detec_results_path= r"C:\Keypoint_detec_results"
-        self.keypoint_detec_chosen_models = r"C:\Keypoint_detec_best_models"
+
+        #self.not_annotated_IRIIS_images_folder= r"C:\wuerth_iriis_theRest"
+        #self.not_annotated_SIRIUS_images_folder = r"D:\FINAL DATASET\wuerth_sirius_theRest"
+        self.not_annotated_all_data=r"C:\Keypoint_detector_test_data"
+        self.keypoint_detec_results_test_data=r"C:\Keypoint_detec_results"
+        self.keypoint_detector_models_path= r"E:\KEYPOINT_DETECTOR\Keypoint_detec_models"
+        self.keypoint_detec_model = "Keypoint_detector_model.h5"
+        self.keypoint_detec_results_path= r"E:\KEYPOINT_DETECTOR\Keypoint_detec_results"
+        self.keypoint_detec_chosen_models = r"C:\Users\lukic4\Desktop\neural_image_enhancer_backup\Keypoint_detector_choosen_models"
 
         self.keypoint_detec_IMG_SIZE = 224
         self.keypoint_detec_BATCH_SIZE = 64
-        self.keypoint_detec_EPOCHS = 5000
+        self.keypoint_detec_EPOCHS = 3000
         self.num_keypoints= 4 * 2  # 4 pairs each having x and y coordinates
 
 
 
-
+#########################################################################################
+################################## DEPTH ESTIMATOR STUFF : ################################
+########################################################################################
+        self.DEPTH_ESTIMATOR_EPOCHS =2000
+        self.DEPTH_ESTIMATOR_WHOLE_DATASET=r"E:\DEPTH_ESTIMATOR\DATASET_FULL"
+        self.DEPTH_ESTIMATOR_RESULTS_MODELS= r"Depth_Estimator_TRAINING"
+        #self.DEPTH_ESTIMATOR_DATASET_TRAIN_FOLDER= r"E:\IRIISxSIRIUS\FINAL_ALL_TRIPLETS_SIRIUS"
+        #self.DEPTH_ESTIMATOR_DATASET_VALIDATION_FOLDER= r"E:\IRIISxSIRIUS\SIRIUS_triplets_validation"
 
 

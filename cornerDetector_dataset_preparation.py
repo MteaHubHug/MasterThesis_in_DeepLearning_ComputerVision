@@ -119,7 +119,7 @@ def copy_selected_images(old_path,new_path,ids):
     cnt=0
     for image in images:
         id=image.split("_")[0]
-        if id in ids:
+        if id not in ids:
             cnt+=1
             print(id)
             old_name=old_path + "\\" + image
@@ -137,16 +137,27 @@ def get_not_annotated_images(input_file):
     json_decode = json.load(input_file)
     ids=[]
     for filename in json_decode["_via_img_metadata"]:
-        id = json_decode["_via_img_metadata"][filename]["filename"].split("/")[1].split("_")[0]  # id example : 41000103322-20210907T053847  # len(41000103322)=11 :(
+        id=json_decode["_via_img_metadata"][filename]["filename"].split("_")[0]
+        #id = json_decode["_via_img_metadata"][filename]["filename"].split("/")[1].split("_")[0]  # id example : 41000103322-20210907T053847  # len(41000103322)=11 :(
         timestamp=id.split("-")[1]
-        if(id[0]=="4"):
-            id=id.split("-")[0][:-1]+"-"+timestamp  # id examle now : 4100010332-20210907T053847 # len(4100010332)=10 :)
+        print(id, "****" ,len(id))
+        #if(id[0]=="4"):
+        #    id=id.split("-")[0][:-1]+"-"+timestamp  # id examle now : 4100010332-20210907T053847 # len(4100010332)=10 :)
         regions = json_decode["_via_img_metadata"][filename]["regions"]
-        if (len(regions) == 0):
-           ids.append(id)
+        ids.append(id)
+        #if (len(regions) == 0):
+        #   ids.append(id)
     return  ids
 
-input_file=conf.IRIIS_json
-not_annotated_iriis_path=conf.not_annotated_IRIIS_images_folder
-not_annotated=get_not_annotated_images(input_file)
-copy_selected_images(iriis_original_folder,not_annotated_iriis_path,not_annotated)
+#input_file=conf.IRIIS_json
+#not_annotated_iriis_path=conf.not_annotated_IRIIS_images_folder
+#not_annotated=get_not_annotated_images(input_file)
+#copy_selected_images(iriis_original_folder,not_annotated_iriis_path,not_annotated)
+
+sirius_original_folder=r"D:\FINAL DATASET\wuerth_sirius"
+
+input_file=conf.SIRIUS_json
+not_annotated_sirius_path=conf.not_annotated_SIRIUS_images_folder
+annotated=get_not_annotated_images(input_file)
+
+copy_selected_images(sirius_original_folder,not_annotated_sirius_path,annotated)
