@@ -53,7 +53,7 @@ class SharedConfigurations():
         self.img_mode = 'rgb'  # 'grayscale'
         self.batch_size = 51
         self.rnd_seed = 48
-        self.tot_iterations = 100000
+        self.tot_iterations = 100
         self.learning_rate=1e-4
 
         self.layer_change_Trainable2Nontrainable= 221
@@ -116,7 +116,7 @@ class SharedConfigurations():
 #########################################################################################
 ################################## DEPTH ESTIMATOR STUFF : ################################
 ########################################################################################
-        self.DEPTH_ESTIMATOR_EPOCHS =2000
+        self.DEPTH_ESTIMATOR_EPOCHS =10000
         self.DEPTH_ESTIMATOR_WHOLE_DATASET=r"E:\DEPTH_ESTIMATOR\DATASET_FULL"
         self.DEPTH_ESTIMATOR_RESULTS_MODELS= r"Depth_Estimator_TRAINING"
         self.DEPTH_ESTIMATOR_RESULTS_DEPTHS= r"E:\DEPTH_ESTIMATOR\RESULTS_DEPTHS"
