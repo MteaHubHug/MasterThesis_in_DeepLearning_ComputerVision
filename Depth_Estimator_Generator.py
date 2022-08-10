@@ -12,15 +12,15 @@ from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 from Configs import SharedConfigurations
 
 config =SharedConfigurations()
-path_train=r"E:\DEPTH_ESTIMATOR\DATASET_train"
-path_validation=r"E:\DEPTH_ESTIMATOR\DATASET_validation"
+path_train=config.DEPTH_ESTIMATOR_WHOLE_DATASET
+#path_train=r"E:\DEPTH_ESTIMATOR\DATASET_train"
+#path_validation=r"E:\DEPTH_ESTIMATOR\DATASET_validation"
 path_result_models=config.DEPTH_ESTIMATOR_RESULTS_MODELS
 save_dir=config.DEPTH_ESTIMATOR_RESULTS_DEPTHS
 HEIGHT = 256
 WIDTH = 256
 LR = 0.0002
-EPOCHS = 2
-BATCH_SIZE = 32
+BATCH_SIZE = 128
 #### get data from folder ##########################
 def get_data(path):
     filelist = []
@@ -32,13 +32,13 @@ def get_data(path):
             filelist.append(file_path)
     filelist.sort()
     data = {
-        "image": [x for x in filelist if x.endswith("-color.png")],
-        "depth": [x for x in filelist if x.endswith("-depth.png")],
+        "image": [x for x in filelist if x.endswith("iriis.jpg")],
+        "depth": [x for x in filelist if x.endswith("depth.png")],
         #"mask": [x for x in filelist if x.endswith("-depth_mask.npy")],
     }
     return data
 
-data=get_data(path_validation)
+data=get_data(path_train) #path_validation
 df = pd.DataFrame(data)
 df = df.sample(frac=1, random_state=42)
 
@@ -145,7 +145,7 @@ def visualize_depth_map(save_dir,df,samples, test=False, model=None):
             plt.show()
 
 
-data_gen=DataGenerator(data=df, batch_size=6, dim=(HEIGHT, WIDTH))
-visualize_samples  = next(iter(data_gen))
+#data_gen=DataGenerator(data=df, batch_size=6, dim=(HEIGHT, WIDTH))
+#visualize_samples  = next(iter(data_gen))
 
-visualize_depth_map(save_dir,df,visualize_samples)
+#visualize_depth_map(save_dir,df,visualize_samples)

@@ -1,4 +1,3 @@
-
 import os
 import sys
 import tensorflow as tf
@@ -12,17 +11,24 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 from Configs import SharedConfigurations
 from Depth_Estimator_Model import DepthEstimationModel
-from Depth_Estimator_Generator import DataGenerator, visualize_depth_map,df
+from Depth_Estimator_Generator import DataGenerator, visualize_depth_map, get_data
 config =SharedConfigurations()
-path_train=r"E:\DEPTH_ESTIMATOR\DATASET_train"
-path_validation=r"E:\DEPTH_ESTIMATOR\DATASET_validation"
+#path_train=r"E:\KEYPOINT_RESULTS__DEPTH_ESTIMATOR_INPUT\FINAL_DATASET_DEPTH_ESTIMATOR"
+#path_train=r"E:\DEPTH_ESTIMATOR\DATASET_validation"
+path_train=config.DEPTH_ESTIMATOR_WHOLE_DATASET
+#path_train=r"E:\DEPTH_ESTIMATOR\DATASET_validation"
 path_result_models=config.DEPTH_ESTIMATOR_RESULTS_MODELS
 results_dir=config.DEPTH_ESTIMATOR_RESULTS_DEPTHS
 HEIGHT = 256
 WIDTH = 256
 LR = 0.0002
-EPOCHS = 2
+EPOCHS = config.DEPTH_ESTIMATOR_EPOCHS
 BATCH_SIZE = 32
+
+data=get_data(path_train)
+df = pd.DataFrame(data)
+df = df.sample(frac=1, random_state=42)
+
 
 ###################### TRAINING ##############################
 optimizer = tf.keras.optimizers.Adam(
@@ -44,10 +50,10 @@ cross_entropy = tf.keras.losses.SparseCategoricalCrossentropy(
 model.compile(optimizer, loss=cross_entropy)
 
 train_loader = DataGenerator(
-    data=df[:20].reset_index(drop="true"), batch_size=BATCH_SIZE, dim=(HEIGHT, WIDTH) # insted of 20 => should be 260
+    data=df[:7298].reset_index(drop="true"), batch_size=BATCH_SIZE, dim=(HEIGHT, WIDTH) # insted of 20 => should be 260  ...14598
 )
 validation_loader = DataGenerator(
-    data=df[20:].reset_index(drop="true"), batch_size=BATCH_SIZE, dim=(HEIGHT, WIDTH) # insted of 20 => should be 260
+    data=df[7298:].reset_index(drop="true"), batch_size=BATCH_SIZE, dim=(HEIGHT, WIDTH) # insted of 20 => should be 260
 )
 history=model.fit(
     train_loader,
@@ -60,7 +66,7 @@ history=model.fit(
 test_loader = next(
     iter(
         DataGenerator(
-            data=df, batch_size=6, dim=(HEIGHT, WIDTH) # 265
+            data=df, batch_size=265, dim=(HEIGHT, WIDTH) # 265
         )
     )
 )
