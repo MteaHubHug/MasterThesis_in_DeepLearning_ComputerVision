@@ -119,12 +119,17 @@ class SharedConfigurations():
         self.DEPTH_ESTIMATOR_HEIGHT=256
         self.DEPTH_ESTIMATOR_WIDTH=256
         self.DEPTH_ESTIMATOR_BATCH_SIZE=128
-        self.DEPTH_ESTIMATOR_EPOCHS =5000
+        self.DEPTH_ESTIMATOR_EPOCHS =100
         self.DEPTH_ESTIMATOR_WHOLE_DATASET=r"E:\KEYPOINT_RESULTS__DEPTH_ESTIMATOR_INPUT\FINAL_DATASET_DEPTH_ESTIMATOR"
         self.DEPTH_ESTIMATOR_RESULTS_MODELS= r"Depth_Estimator_TRAINING"
         self.DEPTH_ESTIMATOR_RESULTS_DEPTHS= r"E:\DEPTH_ESTIMATOR\RESULTS_DEPTHS"
-        self.DEPTH_ESTIMATOR_MODEL=r"C:\Users\lukic4\Desktop\neural_image_enhancer_backup\Depth_Estimator_TRAINING\depth_estimator\DepthEstimator_save_at_5"
+        self.DEPTH_ESTIMATOR_MODEL=r"C:\Users\lukic4\Desktop\neural_image_enhancer_backup\Depth_Estimator_model"
         #self.DEPTH_ESTIMATOR_DATASET_TRAIN_FOLDER= r"E:\IRIISxSIRIUS\FINAL_ALL_TRIPLETS_SIRIUS"
         #self.DEPTH_ESTIMATOR_DATASET_VALIDATION_FOLDER= r"E:\IRIISxSIRIUS\SIRIUS_triplets_validation"
 
+
+
+
+
+        self.FINAL_RESULTS_VISUALIZATION_PATH=r"E:\NEURAL_IMAGE_ENHANCER_FINAL_RESULTS"
 
