@@ -18,7 +18,8 @@ def make_plot(folder):
         imname=folder + "\\" + images[i]
         img=Image.open(imname)
         plt.imshow(img)
-
+        plt.axis("off")
+    plt.axis('off')
     plt.show()
 
 make_plot(folder)

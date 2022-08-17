@@ -134,6 +134,7 @@ def visualize_depth_map(save_dir,df,samples, test=False, model=None):
 
             plt.imshow((pred[i].squeeze()), cmap=cmap)
             ###plt.show()
+            plt.axis("off")
             plt.savefig(imname,dpi=300)
             plt.close()
     else:
