@@ -8,6 +8,8 @@ import matplotlib
 from matplotlib.pylab import cm
 import keras.models
 import pandas as pd
+from IPython.display import display
+from tabulate import tabulate
 from matplotlib import pyplot as plt
 from Configs import SharedConfigurations
 conf=SharedConfigurations()
@@ -39,8 +41,10 @@ def get_data(path):
 
 data=get_data(path_test_data) #path_validation
 df = pd.DataFrame(data)
+print(tabulate(df, headers = 'keys', tablefmt = 'psql'))
 #df = df.sample(frac=1, random_state=42)
-df = df.sample(frac=1)
+#display(df)
+#print(tabulate(df, headers = 'keys', tablefmt = 'psql'))
 def visualize_depth_map(img_dir,save_dir,df,samples, test=False, model=None):
     input = samples
     cmap = copy.copy(cm.get_cmap("jet"))
@@ -147,6 +151,9 @@ test_loader = next(
         )
     )
 )
+
+
+
 visualize_depth_map(path_test_data,results_dir,df, test_loader, test=True, model=model)
 
 
