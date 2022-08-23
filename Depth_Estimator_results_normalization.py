@@ -1,5 +1,6 @@
 import cv2
 import matplotlib
+import numpy
 from matplotlib import colors
 from matplotlib import pyplot as plt
 from matplotlib.pylab import colorbar,cm
@@ -29,26 +30,34 @@ def get_values_in_cm(image_path):
 
 #get_values_in_cm(image_path)
 
-
-
 img=cv2.imread(image_path)
 
-def normalize_image(image):
+def rgb2centimeters(image):
+    aa=[]
     for a in image:
+        bb=[]
         for b in a:
+            cc=[]
             for c in b:
-                norma=c//5 -1
-                print(c, norma)
+                norma=c//5
+                #print(c, norma)
+                cc.append(norma)
+            bb.append(cc)
+        aa.append(bb)
+    aa2=numpy.array(aa)
+    plt.imshow(aa2, interpolation='nearest')
+    plt.show()
 
-normalize_image(img)
+rgb2centimeters(img)
 
 
-# 255 : 5 = 51
+# 0 - 255  RGB ==> 0 - 50 cm
 
 # 0-5 ==> 0
 # 5-10 ==> 1
 # 10-15 ==> 2
 # 15-20 ==> 3
+# 20-25 ==> 4
 # ...
 # 250 ==> 49
 # 255 ==> 50
