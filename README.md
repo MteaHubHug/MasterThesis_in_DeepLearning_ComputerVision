@@ -36,11 +36,20 @@ When you see that accuracy and loss are satisfying,
 Tip : there is a augumentation layer, before running the training, do not forget to set parameter "train" in RandomColor() function to "true".
 Also, when you are creating augumentation visualisations, you want that parameter to be = "false".  
 
+![Augumented examples](repoImg1.png)
+
 Model is defined in "model_definition.py". Base model is EfficientNetB0 with "imagenet" weights. 
 In learning script : "learn_from_scratch.py", you can print logs and find out the index of a layer that you want to unfreeze fisrt,
 for the purpose of fine tuning. Also, Netron app is helpful here for visualisation of the whole network model.
 
 For visualizing the results, organize dataset with "separate_train_valid_data.py", then use "prepare_results_validation.py".
+
+![Classification - results](repoImg2.png)
+
+
+![Validation data - results - heatmap](repoImg3.png)
+
+
 
 # Keypoint Detector 
 
