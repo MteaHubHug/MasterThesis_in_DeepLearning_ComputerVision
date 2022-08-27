@@ -126,3 +126,6 @@ Visuals, motivation and idea are presented in NEURAL_IMAGE_ENHANCER.pptx.
 References : 
 https://keras.io/examples/vision/keypoint_detection/
 https://keras.io/examples/vision/depth_estimation/
+
+
+This master's thesis was a project in the company where I worked. I am very grateful for the opportunity. I am especially grateful to the University of Split and the Faculty of Science and to all the professors of the mathematics department for teaching me to think, calculate, analyze and solve problems.
