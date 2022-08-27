@@ -44,10 +44,10 @@ for the purpose of fine tuning. Also, Netron app is helpful here for visualisati
 
 For visualizing the results, organize dataset with "separate_train_valid_data.py", then use "prepare_results_validation.py".
 
-![Classification - results](repoImg2.png)
+![Classification - results](repoImg2.jpg)
 
 
-![Validation data - results - heatmap](repoImg3.png)
+![Validation data - results - heatmap](repoImg3.jpg)
 
 
 
@@ -66,22 +66,32 @@ Here, augumentor is a function.
 When images from dataset are rotated or resized, their keypoints are projected to corresponding augumentated images. 
 In script, you can find comments about that. 
 With Keypoint_detec_augumentation_visual.py, it is easy to visualize augumentated examples.
+
+![Augumented Example](repoImg4.jpg)
+
+
 Keypoint detector - neural network is defined in "Keypoint_detec_model_definition.py". 
 Transfer learning method is used, base model is MobileNetV2 trained on "imagenet" which weights we are using here. 
 
 For training and saving models, there is a script "Keypoint_detec_learning.py". 
 Finally, for loading the model, predicting and saving results, I made a little tool called "Keypoint_detec_results.py". 
-All paths, parameters and hyperparameters are initiallized in Configs.py.  
+All paths, parameters and hyperparameters are initialized in Configs.py.  
 If dataset is not already parsed and structured, "cornerDetector_dataset_preparation.py" might be useful.
 
-Metrics that I used to measure accuracy are intersection over union (IoU) and average Eucledean Distance. 
-The best model is the one that has maximal IoU and minimal average Eucledean distance.
+Metrics that I used to measure accuracy are intersection over union (IoU) and average Euclidean Distance. 
+The best model is the one that has maximal IoU and minimal average Euclidean distance.
 Evaluate and compare your models with those metrics using script : Keypoint_detec_IoU.py . 
+
+![Learning curves - accuracy](repoImg5.png)
+
+![Detected Keypoints](repoImg6.gif)
+
+![Detected Keypoints](repoImg7.gif)
 
 
 # Depth Estimator
 
-Depth Estimator is a model that we will use for estimating depth of an rgb image. On image is a box with its content. 
+Depth Estimator is a model that we will use for estimating depth of a rgb image. On image is a box with its content. 
 We would like to know how much space in the box is taken/filled (in %). 
 
 Dataset contains original RGB image and its depth map (one input = 2 images). 
@@ -98,8 +108,17 @@ The best measure for similarity between images is SSIM.
 Therefore, I made a script for creating error maps of two images (ground truth depth and estimated depth).
 Error maps that you can get with "Depth_Estimator_ErrorMap.py" are difference map, SSIM difference map and SSIM threshold. 
 There is also line in a script that is printing out calculated SSIM. 
+
+![Estimated Depth with SSIM Error Map](repoImg8.png)
+
+![Estimated Depth with SSIM Error Map](repoImg9.png)
+
+
 It remains to normalize the depth estimation and calculate the percentage of occupied space in the box.
 That we can do with "Depth_Estimator_results_normalization.py" and "Depth_Estimator_Calculate_Area.py".
+
+![Normalized Estimated Depth](repoImg10.jpg)
+
 
 Visuals, motivation and idea are presented in NEURAL_IMAGE_ENHANCER.pptx. 
 
