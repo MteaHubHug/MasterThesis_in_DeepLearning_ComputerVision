@@ -47,10 +47,6 @@ For visualizing the results, organize dataset with "separate_train_valid_data.py
 ![Classification - results](repoImg2.jpg)
 
 
-![Validation data - results - heatmap](repoImg3.jpg)
-
-
-
 # Keypoint Detector 
 
 Keypoint Detector is a feature for detecting corners of boxes, so we can do normalization on dataset. 
